@@ -6,3 +6,5 @@ pluginManagement {
     }
 }
 rootProject.name = "snappicker"
+
+include(":snappicker-compose")
