@@ -1,0 +1,13 @@
+*.jar
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+.DS_Store
+local.properties
