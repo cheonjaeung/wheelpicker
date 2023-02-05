@@ -22,7 +22,7 @@ public class SnapPickerState<T>(
      * The index of the current selected item.
      */
     public var currentIndex: Int by mutableStateOf(initialIndex)
-        private set
+        internal set
 
     public companion object {
         /**
