@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,23 +37,32 @@ public fun <T> SnapPicker(
     itemContent: @Composable (value: T) -> Unit
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val lazyState = rememberLazyListState(initialFirstVisibleItemIndex = state.currentIndex)
+        val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = state.currentIndex)
         var itemHeightPx by remember { mutableStateOf(0) }
         val density = LocalDensity.current
         val verticalPadding by remember {
             derivedStateOf {
-                val fullHeightPx = lazyState.layoutInfo.viewportSize.height
+                val fullHeightPx = lazyListState.layoutInfo.viewportSize.height
                 val marginPx = (fullHeightPx / 2) - (itemHeightPx / 2)
                 return@derivedStateOf with(density) { marginPx.toDp() }
             }
         }
+        LaunchedEffect(lazyListState.isScrollInProgress) {
+            if (!lazyListState.isScrollInProgress) {
+                val visibleItemsInfo = lazyListState.layoutInfo.visibleItemsInfo
+                val centerItemInfo = visibleItemsInfo.find { it.offset == 0 }
+                if (centerItemInfo != null) {
+                    state.currentIndex = centerItemInfo.index
+                }
+            }
+        }
         LazyColumn(
             modifier = Modifier.size(width = maxWidth, height = maxHeight),
-            state = lazyState,
+            state = lazyListState,
             contentPadding = PaddingValues(vertical = verticalPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyState)
+            flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
         ) {
             items(count = state.values.size) { index ->
                 Box(modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
