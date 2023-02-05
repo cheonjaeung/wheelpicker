@@ -1,6 +1,7 @@
 package com.example.snappicker.android.compose
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -37,7 +38,7 @@ public class MainActivity : ComponentActivity() {
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp)
+                            .height(240.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.White),
                         itemContent = { value ->
