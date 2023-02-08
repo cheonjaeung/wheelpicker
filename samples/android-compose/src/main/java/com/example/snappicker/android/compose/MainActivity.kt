@@ -1,7 +1,6 @@
 package com.example.snappicker.android.compose
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,7 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.woong.snappicker.compose.ExperimentalSnapPickerApi
-import io.woong.snappicker.compose.SnapPicker
+import io.woong.snappicker.compose.VerticalSnapPicker
 import io.woong.snappicker.compose.rememberSnapPickerState
 
 public class MainActivity : ComponentActivity() {
@@ -31,7 +30,7 @@ public class MainActivity : ComponentActivity() {
                         .padding(all = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    SnapPicker(
+                    VerticalSnapPicker(
                         state = rememberSnapPickerState(
                             values = (0..999).map { it },
                             initialIndex = 13
