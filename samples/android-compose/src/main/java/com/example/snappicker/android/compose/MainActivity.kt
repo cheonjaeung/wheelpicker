@@ -31,10 +31,7 @@ public class MainActivity : ComponentActivity() {
                     contentAlignment = Alignment.Center
                 ) {
                     VerticalSnapPicker(
-                        state = rememberSnapPickerState(
-                            values = (0..999).map { it },
-                            initialIndex = 13
-                        ),
+                        state = rememberSnapPickerState(values = (0..999).map { it }),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(240.dp)
@@ -42,21 +39,18 @@ public class MainActivity : ComponentActivity() {
                             .background(Color.White),
                         itemContent = { value ->
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp),
+                                modifier = Modifier.fillMaxWidth().height(60.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 BasicText(text = value.toString())
                             }
                         }
                     )
-
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth()
-                            .height(64.dp)
+                            .height(48.dp)
                             .background(Color(0x11000000))
                     )
                 }
