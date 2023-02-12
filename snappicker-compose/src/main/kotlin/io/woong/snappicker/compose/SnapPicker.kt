@@ -1,5 +1,6 @@
 package io.woong.snappicker.compose
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -93,7 +94,7 @@ private fun <T> SnapPicker(
     LaunchedEffect(lazyListState.isScrollInProgress) {
         if (!lazyListState.isScrollInProgress) {
             val visibleItemsInfo = lazyListState.layoutInfo.visibleItemsInfo
-            val centerItemInfo = visibleItemsInfo.find { it.offset == 0 }
+            val centerItemInfo = visibleItemsInfo.find { it.offset in -1..1 }
             if (centerItemInfo != null) {
                 state.currentIndex = centerItemInfo.index
             }
