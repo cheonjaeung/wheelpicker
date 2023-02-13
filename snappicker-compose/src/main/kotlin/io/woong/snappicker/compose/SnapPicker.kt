@@ -1,8 +1,8 @@
 package io.woong.snappicker.compose
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -44,7 +44,7 @@ public fun <T> HorizontalSnapPicker(
     state: SnapPickerState<T>,
     modifier: Modifier = Modifier,
     itemWidth: Dp = 48.dp,
-    itemContent: @Composable (value: T) -> Unit
+    itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     SnapPicker(
         state = state,
@@ -69,7 +69,7 @@ public fun <T> VerticalSnapPicker(
     state: SnapPickerState<T>,
     modifier: Modifier = Modifier,
     itemHeight: Dp = 48.dp,
-    itemContent: @Composable (value: T) -> Unit
+    itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     SnapPicker(
         state = state,
@@ -88,7 +88,7 @@ private fun <T> SnapPicker(
     isVertical: Boolean,
     modifier: Modifier = Modifier,
     itemSize: DpSize,
-    itemContent: @Composable (value: T) -> Unit
+    itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = state.currentIndex)
     LaunchedEffect(lazyListState.isScrollInProgress) {
@@ -126,10 +126,9 @@ private fun <T> SnapPicker(
                             .height(itemSize.height)
                             .onGloballyPositioned { layoutCoordinates ->
                                 itemHeightPx = layoutCoordinates.size.height
-                            }
-                    ) {
-                        itemContent(state.values[index])
-                    }
+                            },
+                        content = { itemContent(state.values[index]) }
+                    )
                 }
             }
         } else {

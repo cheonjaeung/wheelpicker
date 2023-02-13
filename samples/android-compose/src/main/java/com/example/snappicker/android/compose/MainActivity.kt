@@ -38,12 +38,10 @@ public class MainActivity : ComponentActivity() {
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.White),
                         itemContent = { value ->
-                            Box(
-                                modifier = Modifier.fillMaxWidth().height(60.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                BasicText(text = value.toString())
-                            }
+                            BasicText(
+                                text = value.toString(),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
                         }
                     )
                     Box(

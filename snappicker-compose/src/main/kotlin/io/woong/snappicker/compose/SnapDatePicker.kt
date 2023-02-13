@@ -1,5 +1,6 @@
 package io.woong.snappicker.compose
 
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
@@ -22,7 +23,7 @@ public fun SnapDatePicker(
     state: SnapDatePickerState,
     modifier: Modifier = Modifier,
     itemHeight: Dp = 48.dp,
-    itemContent: @Composable (value: Int) -> Unit
+    itemContent: @Composable BoxScope.(value: Int) -> Unit
 ) {
     val yearState = rememberSnapPickerState(
         values = (0..9999).map { it },
