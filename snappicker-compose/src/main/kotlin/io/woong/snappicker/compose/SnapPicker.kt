@@ -35,7 +35,10 @@ import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
  *
  * @param state The state object to manage this picker's state.
  * @param modifier The modifier to apply to this composable.
- * @param itemWidth The width size of each item composable's container size.
+ * @param itemWidth The width size of each item composable's container.
+ * @param repeated Whether this picker has repeating list.
+ * When `true`, user can scroll continuously over the end of list.
+ * The first item will displayed before first and the last will displayed after first.
  * @param itemContent The content composable of the single item.
  */
 @ExperimentalSnapPickerApi
@@ -44,6 +47,7 @@ public fun <T> HorizontalSnapPicker(
     state: SnapPickerState<T>,
     modifier: Modifier = Modifier,
     itemWidth: Dp = 48.dp,
+    repeated: Boolean = false,
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     SnapPicker(
@@ -51,6 +55,7 @@ public fun <T> HorizontalSnapPicker(
         isVertical = false,
         modifier = modifier,
         itemSize = DpSize(width = itemWidth, height = 0.dp),
+        repeated = repeated,
         itemContent = itemContent
     )
 }
@@ -60,7 +65,10 @@ public fun <T> HorizontalSnapPicker(
  *
  * @param state The state object to manage this picker's state.
  * @param modifier The modifier to apply to this composable.
- * @param itemHeight The height size of each item composable's container size.
+ * @param itemHeight The height size of each item composable's container.
+ * @param repeated Whether this picker has repeating list.
+ * When `true`, user can scroll continuously over the end of list.
+ * The first item will displayed before first and the last will displayed after first.
  * @param itemContent The content composable of the single item.
  */
 @ExperimentalSnapPickerApi
@@ -69,6 +77,7 @@ public fun <T> VerticalSnapPicker(
     state: SnapPickerState<T>,
     modifier: Modifier = Modifier,
     itemHeight: Dp = 48.dp,
+    repeated: Boolean = false,
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     SnapPicker(
@@ -76,6 +85,7 @@ public fun <T> VerticalSnapPicker(
         isVertical = true,
         modifier = modifier,
         itemSize = DpSize(width = 0.dp, height = itemHeight),
+        repeated = repeated,
         itemContent = itemContent
     )
 }
@@ -86,17 +96,30 @@ public fun <T> VerticalSnapPicker(
 private fun <T> SnapPicker(
     state: SnapPickerState<T>,
     isVertical: Boolean,
-    modifier: Modifier = Modifier,
     itemSize: DpSize,
+    repeated: Boolean,
+    modifier: Modifier,
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
-    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = state.currentIndex)
+    val lazyListState = rememberLazyListState(
+        initialFirstVisibleItemIndex = if (repeated) {
+            ((Int.MAX_VALUE - (Int.MAX_VALUE % state.values.size)) / 2) + state.currentIndex
+        } else {
+            state.currentIndex
+        }
+    )
     LaunchedEffect(lazyListState.isScrollInProgress) {
         if (!lazyListState.isScrollInProgress) {
             val visibleItemsInfo = lazyListState.layoutInfo.visibleItemsInfo
             val centerItemInfo = visibleItemsInfo.find { it.offset in -1..1 }
             if (centerItemInfo != null) {
-                state.currentIndex = centerItemInfo.index
+                val newIndex = centerItemInfo.index % state.values.size
+                state.currentIndex = newIndex
+                if (repeated) {
+                    lazyListState.scrollToItem(
+                        ((Int.MAX_VALUE - (Int.MAX_VALUE % state.values.size)) / 2) + newIndex
+                    )
+                }
             }
         }
     }
@@ -119,16 +142,30 @@ private fun <T> SnapPicker(
                 verticalArrangement = Arrangement.Center,
                 flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
             ) {
-                items(count = state.values.size) { index ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(itemSize.height)
-                            .onGloballyPositioned { layoutCoordinates ->
-                                itemHeightPx = layoutCoordinates.size.height
-                            },
-                        content = { itemContent(state.values[index]) }
-                    )
+                if (repeated) {
+                    items(count = Int.MAX_VALUE) { index ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(itemSize.height)
+                                .onGloballyPositioned { layoutCoordinates ->
+                                    itemHeightPx = layoutCoordinates.size.height
+                                },
+                            content = { itemContent(state.values[index % state.values.size]) }
+                        )
+                    }
+                } else {
+                    items(count = state.values.size) { index ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(itemSize.height)
+                                .onGloballyPositioned { layoutCoordinates ->
+                                    itemHeightPx = layoutCoordinates.size.height
+                                },
+                            content = { itemContent(state.values[index]) }
+                        )
+                    }
                 }
             }
         } else {
@@ -149,16 +186,29 @@ private fun <T> SnapPicker(
                 verticalAlignment = Alignment.CenterVertically,
                 flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
             ) {
-                items(count = state.values.size) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(itemSize.width)
-                            .fillMaxHeight()
-                            .onGloballyPositioned { layoutCoordinates ->
-                                itemWidthPx = layoutCoordinates.size.width
-                            }
-                    ) {
-                        itemContent(state.values[index])
+                if (repeated) {
+                    items(count = Int.MAX_VALUE) { index ->
+                        Box(
+                            modifier = Modifier
+                                .width(itemSize.width)
+                                .fillMaxHeight()
+                                .onGloballyPositioned { layoutCoordinates ->
+                                    itemWidthPx = layoutCoordinates.size.width
+                                },
+                            content = { itemContent(state.values[index % state.values.size]) }
+                        )
+                    }
+                } else {
+                    items(count = state.values.size) { index ->
+                        Box(
+                            modifier = Modifier
+                                .width(itemSize.width)
+                                .fillMaxHeight()
+                                .onGloballyPositioned { layoutCoordinates ->
+                                    itemWidthPx = layoutCoordinates.size.width
+                                },
+                            content = { itemContent(state.values[index]) }
+                        )
                     }
                 }
             }
