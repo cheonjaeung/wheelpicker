@@ -11,19 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -103,7 +97,10 @@ private fun <T> SnapPicker(
 ) {
     val lazyListState = rememberLazyListState(
         initialFirstVisibleItemIndex = if (repeated) {
-            ((Int.MAX_VALUE - (Int.MAX_VALUE % state.values.size)) / 2) + state.currentIndex
+            calculateAroundMidIndex(
+                index = state.currentIndex,
+                valuesCount = state.values.size
+            )
         } else {
             state.currentIndex
         }
@@ -116,8 +113,9 @@ private fun <T> SnapPicker(
                 val newIndex = centerItemInfo.index % state.values.size
                 state.currentIndex = newIndex
                 if (repeated) {
-                    lazyListState.scrollToItem(
-                        ((Int.MAX_VALUE - (Int.MAX_VALUE % state.values.size)) / 2) + newIndex
+                    lazyListState.scrollToAroundMidIndex(
+                        index = newIndex,
+                        valuesCount = state.values.size
                     )
                 }
             }
@@ -125,88 +123,52 @@ private fun <T> SnapPicker(
     }
     BoxWithConstraints(modifier = modifier) {
         if (isVertical) {
-            val density = LocalDensity.current
-            var itemHeightPx by remember { mutableStateOf(0) }
-            val verticalPadding by remember {
-                derivedStateOf {
-                    val fullHeightPx = lazyListState.layoutInfo.viewportSize.height
-                    val marginPx = (fullHeightPx / 2) - (itemHeightPx / 2)
-                    return@derivedStateOf with(density) { marginPx.toDp() }
-                }
-            }
             LazyColumn(
                 modifier = Modifier.size(width = maxWidth, height = maxHeight),
                 state = lazyListState,
-                contentPadding = PaddingValues(vertical = verticalPadding),
+                contentPadding = PaddingValues(vertical = (maxHeight / 2) - (itemSize.height / 2)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
             ) {
+                val itemBoxModifier = Modifier.fillMaxWidth().height(itemSize.height)
                 if (repeated) {
                     items(count = Int.MAX_VALUE) { index ->
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(itemSize.height)
-                                .onGloballyPositioned { layoutCoordinates ->
-                                    itemHeightPx = layoutCoordinates.size.height
-                                },
+                            modifier = itemBoxModifier,
                             content = { itemContent(state.values[index % state.values.size]) }
                         )
                     }
                 } else {
                     items(count = state.values.size) { index ->
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(itemSize.height)
-                                .onGloballyPositioned { layoutCoordinates ->
-                                    itemHeightPx = layoutCoordinates.size.height
-                                },
+                            modifier = itemBoxModifier,
                             content = { itemContent(state.values[index]) }
                         )
                     }
                 }
             }
         } else {
-            val density = LocalDensity.current
-            var itemWidthPx by remember { mutableStateOf(0) }
-            val horizontalPadding by remember {
-                derivedStateOf {
-                    val fullWidthPx = lazyListState.layoutInfo.viewportSize.width
-                    val marginPx = (fullWidthPx / 2) - (itemWidthPx / 2)
-                    return@derivedStateOf with(density) { marginPx.toDp() }
-                }
-            }
             LazyRow(
                 modifier = Modifier.size(width = maxWidth, height = maxHeight),
                 state = lazyListState,
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                contentPadding = PaddingValues(horizontal = (maxWidth / 2) - (itemSize.width) / 2),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
             ) {
+                val itemBoxModifier = Modifier.width(itemSize.width).fillMaxHeight()
                 if (repeated) {
                     items(count = Int.MAX_VALUE) { index ->
                         Box(
-                            modifier = Modifier
-                                .width(itemSize.width)
-                                .fillMaxHeight()
-                                .onGloballyPositioned { layoutCoordinates ->
-                                    itemWidthPx = layoutCoordinates.size.width
-                                },
+                            modifier = itemBoxModifier,
                             content = { itemContent(state.values[index % state.values.size]) }
                         )
                     }
                 } else {
                     items(count = state.values.size) { index ->
                         Box(
-                            modifier = Modifier
-                                .width(itemSize.width)
-                                .fillMaxHeight()
-                                .onGloballyPositioned { layoutCoordinates ->
-                                    itemWidthPx = layoutCoordinates.size.width
-                                },
+                            modifier = itemBoxModifier,
                             content = { itemContent(state.values[index]) }
                         )
                     }
@@ -214,4 +176,12 @@ private fun <T> SnapPicker(
             }
         }
     }
+}
+
+private fun calculateAroundMidIndex(index: Int, valuesCount: Int): Int {
+    return ((Int.MAX_VALUE - (Int.MAX_VALUE % valuesCount)) / 2) + index
+}
+
+private suspend fun LazyListState.scrollToAroundMidIndex(index: Int, valuesCount: Int) {
+    this.scrollToItem(index = calculateAroundMidIndex(index, valuesCount))
 }
