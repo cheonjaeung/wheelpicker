@@ -28,7 +28,7 @@ public class SnapPickerState<T>(
         /**
          * The default saver for [SnapPickerState].
          */
-        @Suppress("FunctionName", "UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST")
         public fun <T> Saver(): Saver<SnapPickerState<T>, List<*>> {
             return Saver(
                 save = { listOf(it.values, it.currentIndex) },
