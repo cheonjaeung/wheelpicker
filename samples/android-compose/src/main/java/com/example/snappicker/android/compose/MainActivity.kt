@@ -31,12 +31,13 @@ public class MainActivity : ComponentActivity() {
                     contentAlignment = Alignment.Center
                 ) {
                     VerticalSnapPicker(
-                        state = rememberSnapPickerState(values = (0..999).map { it }),
+                        state = rememberSnapPickerState(values = (0..9).map { it }),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(240.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.White),
+                        repeated = true,
                         itemContent = { value ->
                             BasicText(
                                 text = value.toString(),
