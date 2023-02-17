@@ -28,6 +28,10 @@ import kotlin.math.abs
  * @param repeated Whether this picker has repeating list.
  * When `true`, user can scroll continuously over the end of list.
  * The first item will displayed before first and the last will displayed after first.
+ * @param decorationBox Composable to add decoration around picker, such as indicator or something.
+ * The actual picker will be passed to this lambda's parameter, "innerPicker".
+ * You must call `innerPicker` to display picker.
+ * If it is not called, the picker never visible.
  * @param itemContent The content composable of the single item.
  */
 @ExperimentalSnapPickerApi
@@ -37,14 +41,17 @@ public fun <T> HorizontalSnapPicker(
     modifier: Modifier = Modifier,
     itemWidth: Dp = 48.dp,
     repeated: Boolean = false,
+    decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit =
+        @Composable { innerPicker -> innerPicker() },
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
-    SnapPicker(
+    CoreSnapPicker(
         state = state,
         isVertical = false,
         itemSize = DpSize(width = itemWidth, height = 0.dp),
         repeated = repeated,
         modifier = modifier,
+        decorationBox = decorationBox,
         itemContent = itemContent
     )
 }
@@ -58,6 +65,10 @@ public fun <T> HorizontalSnapPicker(
  * @param repeated Whether this picker has repeating list.
  * When `true`, user can scroll continuously over the end of list.
  * The first item will displayed before first and the last will displayed after first.
+ * @param decorationBox Composable to add decoration around picker, such as indicator or something.
+ * The actual picker will be passed to this lambda's parameter, "innerPicker".
+ * You must call `innerPicker` to display picker.
+ * If it is not called, the picker never visible.
  * @param itemContent The content composable of the single item.
  */
 @ExperimentalSnapPickerApi
@@ -67,14 +78,17 @@ public fun <T> VerticalSnapPicker(
     modifier: Modifier = Modifier,
     itemHeight: Dp = 48.dp,
     repeated: Boolean = false,
+    decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit =
+        @Composable { innerPicker -> innerPicker() },
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
-    SnapPicker(
+    CoreSnapPicker(
         state = state,
         isVertical = true,
         itemSize = DpSize(width = 0.dp, height = itemHeight),
         repeated = repeated,
         modifier = modifier,
+        decorationBox = decorationBox,
         itemContent = itemContent
     )
 }
@@ -82,12 +96,13 @@ public fun <T> VerticalSnapPicker(
 @OptIn(ExperimentalSnapperApi::class)
 @ExperimentalSnapPickerApi
 @Composable
-private fun <T> SnapPicker(
+private fun <T> CoreSnapPicker(
     state: SnapPickerState<T>,
     isVertical: Boolean,
     itemSize: DpSize,
     repeated: Boolean,
     modifier: Modifier,
+    decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit,
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     val lazyListState = state.lazyListState
@@ -115,79 +130,81 @@ private fun <T> SnapPicker(
         }
     }
     BoxWithConstraints(modifier) {
-        if (isVertical) {
-            LazyColumn(
-                modifier = Modifier.size(maxWidth, maxHeight),
-                state = lazyListState,
-                contentPadding = PaddingValues(vertical = (maxHeight / 2) - (itemSize.height / 2)),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                flingBehavior = rememberSnapperFlingBehavior(lazyListState)
-            ) {
-                val itemBoxModifier = Modifier
-                    .fillMaxWidth()
-                    .height(itemSize.height)
-                if (repeated) {
-                    items(count = Int.MAX_VALUE) { index ->
-                        Box(
-                            modifier = itemBoxModifier.pickerAlpha(
-                                isVertical = false,
-                                index = index,
-                                lazyListState = lazyListState,
-                                snapperLayoutInfo = snapperLayoutInfo
-                            ),
-                            content = { itemContent(state.values[index % state.values.size]) }
-                        )
-                    }
-                } else {
-                    items(count = state.values.size) { index ->
-                        Box(
-                            modifier = itemBoxModifier.pickerAlpha(
-                                isVertical = false,
-                                index = index,
-                                lazyListState = lazyListState,
-                                snapperLayoutInfo = snapperLayoutInfo
-                            ),
-                            content = { itemContent(state.values[index]) }
-                        )
+        decorationBox {
+            if (isVertical) {
+                LazyColumn(
+                    modifier = Modifier.size(maxWidth, maxHeight),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(vertical = (maxHeight / 2) - (itemSize.height / 2)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    flingBehavior = rememberSnapperFlingBehavior(lazyListState)
+                ) {
+                    val itemBoxModifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemSize.height)
+                    if (repeated) {
+                        items(count = Int.MAX_VALUE) { index ->
+                            Box(
+                                modifier = itemBoxModifier.pickerAlpha(
+                                    isVertical = false,
+                                    index = index,
+                                    lazyListState = lazyListState,
+                                    snapperLayoutInfo = snapperLayoutInfo
+                                ),
+                                content = { itemContent(state.values[index % state.values.size]) }
+                            )
+                        }
+                    } else {
+                        items(count = state.values.size) { index ->
+                            Box(
+                                modifier = itemBoxModifier.pickerAlpha(
+                                    isVertical = false,
+                                    index = index,
+                                    lazyListState = lazyListState,
+                                    snapperLayoutInfo = snapperLayoutInfo
+                                ),
+                                content = { itemContent(state.values[index]) }
+                            )
+                        }
                     }
                 }
-            }
-        } else {
-            LazyRow(
-                modifier = Modifier.size(maxWidth, maxHeight),
-                state = lazyListState,
-                contentPadding = PaddingValues(horizontal = (maxWidth / 2) - (itemSize.width) / 2),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                flingBehavior = rememberSnapperFlingBehavior(lazyListState)
-            ) {
-                val itemBoxModifier = Modifier
-                    .width(itemSize.width)
-                    .fillMaxHeight()
-                if (repeated) {
-                    items(count = Int.MAX_VALUE) { index ->
-                        Box(
-                            modifier = itemBoxModifier.pickerAlpha(
-                                isVertical = false,
-                                index = index,
-                                lazyListState = lazyListState,
-                                snapperLayoutInfo = snapperLayoutInfo
-                            ),
-                            content = { itemContent(state.values[index % state.values.size]) }
-                        )
-                    }
-                } else {
-                    items(count = state.values.size) { index ->
-                        Box(
-                            modifier = itemBoxModifier.pickerAlpha(
-                                isVertical = false,
-                                index = index,
-                                lazyListState = lazyListState,
-                                snapperLayoutInfo = snapperLayoutInfo
-                            ),
-                            content = { itemContent(state.values[index]) }
-                        )
+            } else {
+                LazyRow(
+                    modifier = Modifier.size(maxWidth, maxHeight),
+                    state = lazyListState,
+                    contentPadding = PaddingValues(horizontal = (maxWidth / 2) - (itemSize.width) / 2),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    flingBehavior = rememberSnapperFlingBehavior(lazyListState)
+                ) {
+                    val itemBoxModifier = Modifier
+                        .width(itemSize.width)
+                        .fillMaxHeight()
+                    if (repeated) {
+                        items(count = Int.MAX_VALUE) { index ->
+                            Box(
+                                modifier = itemBoxModifier.pickerAlpha(
+                                    isVertical = false,
+                                    index = index,
+                                    lazyListState = lazyListState,
+                                    snapperLayoutInfo = snapperLayoutInfo
+                                ),
+                                content = { itemContent(state.values[index % state.values.size]) }
+                            )
+                        }
+                    } else {
+                        items(count = state.values.size) { index ->
+                            Box(
+                                modifier = itemBoxModifier.pickerAlpha(
+                                    isVertical = false,
+                                    index = index,
+                                    lazyListState = lazyListState,
+                                    snapperLayoutInfo = snapperLayoutInfo
+                                ),
+                                content = { itemContent(state.values[index]) }
+                            )
+                        }
                     }
                 }
             }
