@@ -10,9 +10,9 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 
 /**
- * A state object of the [SnapPicker].
+ * A state object of the picker.
  *
- * @param values Possible values of this [SnapPicker].
+ * @param values Possible values of this picker.
  * @param initialIndex Initial selected item index.
  */
 @ExperimentalSnapPickerApi
@@ -105,7 +105,7 @@ public class SnapPickerState<T>(
 /**
  * Creates and remembers a [SnapPickerState].
  *
- * @param values Possible values of this [SnapPicker].
+ * @param values Possible values of this picker.
  * @param initialIndex Initial selected item index.
  */
 @ExperimentalSnapPickerApi
