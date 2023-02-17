@@ -1,10 +1,10 @@
 package io.woong.snappicker.compose
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,45 +91,39 @@ private fun <T> SnapPicker(
     modifier: Modifier,
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
-    val lazyListState = rememberLazyListState()
-    val snapperLayoutInfo = rememberLazyListSnapperLayoutInfo(lazyListState = lazyListState)
+    val lazyListState = state.lazyListState
+    val snapperLayoutInfo = rememberLazyListSnapperLayoutInfo(lazyListState)
     LaunchedEffect(Unit) {
-        lazyListState.animateScrollToItem(
+        state.animateScrollToItem(
             if (repeated) {
                 calculateAroundMidIndex(
-                    index = state.currentIndex,
+                    index = state.initialIndex,
                     valuesCount = state.values.size
                 )
             } else {
-                state.currentIndex
+                state.initialIndex
             }
         )
     }
-    LaunchedEffect(lazyListState.isScrollInProgress) {
-        if (!lazyListState.isScrollInProgress) {
-            val visibleItemsInfo = lazyListState.layoutInfo.visibleItemsInfo
-            val centerItemInfo = visibleItemsInfo.find { it.offset in -1..1 }
-            if (centerItemInfo != null) {
-                val newIndex = centerItemInfo.index % state.values.size
-                state.currentIndex = newIndex
-                if (repeated) {
-                    lazyListState.scrollToAroundMidIndex(
-                        index = newIndex,
-                        valuesCount = state.values.size
-                    )
-                }
+    if (repeated) {
+        LaunchedEffect(state.isScrollInProgress) {
+            if (!state.isScrollInProgress) {
+                state.scrollToItem(calculateAroundMidIndex(
+                    index = state.index,
+                    valuesCount = state.values.size
+                ))
             }
         }
     }
-    BoxWithConstraints(modifier = modifier) {
+    BoxWithConstraints(modifier) {
         if (isVertical) {
             LazyColumn(
-                modifier = Modifier.size(width = maxWidth, height = maxHeight),
+                modifier = Modifier.size(maxWidth, maxHeight),
                 state = lazyListState,
                 contentPadding = PaddingValues(vertical = (maxHeight / 2) - (itemSize.height / 2)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
+                flingBehavior = rememberSnapperFlingBehavior(lazyListState)
             ) {
                 val itemBoxModifier = Modifier
                     .fillMaxWidth()
@@ -162,12 +156,12 @@ private fun <T> SnapPicker(
             }
         } else {
             LazyRow(
-                modifier = Modifier.size(width = maxWidth, height = maxHeight),
+                modifier = Modifier.size(maxWidth, maxHeight),
                 state = lazyListState,
                 contentPadding = PaddingValues(horizontal = (maxWidth / 2) - (itemSize.width) / 2),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                flingBehavior = rememberSnapperFlingBehavior(lazyListState = lazyListState)
+                flingBehavior = rememberSnapperFlingBehavior(lazyListState)
             ) {
                 val itemBoxModifier = Modifier
                     .width(itemSize.width)
@@ -204,10 +198,6 @@ private fun <T> SnapPicker(
 
 private fun calculateAroundMidIndex(index: Int, valuesCount: Int): Int {
     return ((Int.MAX_VALUE - (Int.MAX_VALUE % valuesCount)) / 2) + index
-}
-
-private suspend fun LazyListState.scrollToAroundMidIndex(index: Int, valuesCount: Int) {
-    this.scrollToItem(index = calculateAroundMidIndex(index, valuesCount))
 }
 
 @OptIn(ExperimentalSnapperApi::class)

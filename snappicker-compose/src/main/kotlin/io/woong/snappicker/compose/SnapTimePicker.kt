@@ -33,11 +33,11 @@ public fun SnapTimePicker(
         values = (0..59).map { it },
         initialIndex = state.currentMinute
     )
-    LaunchedEffect(hourState.currentIndex) {
-        state.currentHour = hourState.currentIndex
+    LaunchedEffect(hourState.index) {
+        state.currentHour = hourState.index
     }
-    LaunchedEffect(minuteState.currentIndex) {
-        state.currentMinute = minuteState.currentIndex
+    LaunchedEffect(minuteState.index) {
+        state.currentMinute = minuteState.index
     }
     Row(modifier = modifier) {
         VerticalSnapPicker(

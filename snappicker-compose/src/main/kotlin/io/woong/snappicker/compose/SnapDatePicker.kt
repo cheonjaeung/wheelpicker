@@ -37,19 +37,19 @@ public fun SnapDatePicker(
         values = (1..calculateLastDate(state.currentYear, state.currentMonth)).map { it },
         initialIndex = state.currentDate - 1
     )
-    LaunchedEffect(yearState.currentIndex) {
-        state.currentYear = yearState.currentIndex
+    LaunchedEffect(yearState.index) {
+        state.currentYear = yearState.index
     }
-    LaunchedEffect(monthState.currentIndex) {
-        state.currentMonth = monthState.currentIndex + 1
+    LaunchedEffect(monthState.index) {
+        state.currentMonth = monthState.index + 1
         val lastDate = calculateLastDate(state.currentYear, state.currentMonth)
         if (state.currentDate > lastDate) {
-            dateState.currentIndex = lastDate
+//            dateState.index = lastDate
             state.currentDate = lastDate
         }
     }
-    LaunchedEffect(dateState.currentIndex) {
-        state.currentDate = dateState.currentIndex + 1
+    LaunchedEffect(dateState.index) {
+        state.currentDate = dateState.index + 1
     }
     Row(modifier = modifier) {
         VerticalSnapPicker(
