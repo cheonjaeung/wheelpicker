@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -34,12 +35,10 @@ import kotlin.math.abs
 /**
  * The horizontal scrollable picker that allows user to select one item from multiple items.
  *
- * @param state The state object to manage this picker's state.
+ * @param values Value list to display in picker.
  * @param modifier The modifier to apply to this composable.
+ * @param state The state object to manage this picker's state.
  * @param itemWidth The width size of each item composable's container.
- * @param repeated Whether this picker has repeating list.
- * When `true`, user can scroll continuously over the end of list.
- * The first item will displayed before first and the last will displayed after first.
  * @param decorationBox Composable to add decoration around picker, such as indicator or something.
  * The actual picker will be passed to this lambda's parameter, "innerPicker".
  * You must call `innerPicker` to display picker.
@@ -49,19 +48,20 @@ import kotlin.math.abs
 @ExperimentalSnapPickerApi
 @Composable
 public fun <T> HorizontalSnapPicker(
-    state: SnapPickerState<T>,
+    values: List<T>,
     modifier: Modifier = Modifier,
+    state: SnapPickerState = rememberSnapPickerState(),
     itemWidth: Dp = 48.dp,
-    repeated: Boolean = false,
     decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit =
         @Composable { innerPicker -> innerPicker() },
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     CoreSnapPicker(
+        values = values,
         state = state,
         isVertical = false,
         itemSize = DpSize(width = itemWidth, height = 0.dp),
-        repeated = repeated,
+        repeated = true,
         modifier = modifier,
         decorationBox = decorationBox,
         itemContent = itemContent
@@ -71,12 +71,10 @@ public fun <T> HorizontalSnapPicker(
 /**
  * The vertical scrollable picker that allows user to select one item from multiple items.
  *
- * @param state The state object to manage this picker's state.
+ * @param values Value list to display in picker.
  * @param modifier The modifier to apply to this composable.
+ * @param state The state object to manage this picker's state.
  * @param itemHeight The height size of each item composable's container.
- * @param repeated Whether this picker has repeating list.
- * When `true`, user can scroll continuously over the end of list.
- * The first item will displayed before first and the last will displayed after first.
  * @param decorationBox Composable to add decoration around picker, such as indicator or something.
  * The actual picker will be passed to this lambda's parameter, "innerPicker".
  * You must call `innerPicker` to display picker.
@@ -86,19 +84,20 @@ public fun <T> HorizontalSnapPicker(
 @ExperimentalSnapPickerApi
 @Composable
 public fun <T> VerticalSnapPicker(
-    state: SnapPickerState<T>,
+    values: List<T>,
     modifier: Modifier = Modifier,
+    state: SnapPickerState = rememberSnapPickerState(),
     itemHeight: Dp = 48.dp,
-    repeated: Boolean = false,
     decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit =
         @Composable { innerPicker -> innerPicker() },
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     CoreSnapPicker(
+        values = values,
         state = state,
         isVertical = true,
         itemSize = DpSize(width = 0.dp, height = itemHeight),
-        repeated = repeated,
+        repeated = true,
         modifier = modifier,
         decorationBox = decorationBox,
         itemContent = itemContent
@@ -109,7 +108,8 @@ public fun <T> VerticalSnapPicker(
 @ExperimentalSnapPickerApi
 @Composable
 private fun <T> CoreSnapPicker(
-    state: SnapPickerState<T>,
+    values: List<T>,
+    state: SnapPickerState,
     isVertical: Boolean,
     itemSize: DpSize,
     repeated: Boolean,
@@ -119,28 +119,36 @@ private fun <T> CoreSnapPicker(
 ) {
     val lazyListState = state.lazyListState
     val snapperLayoutInfo = rememberLazyListSnapperLayoutInfo(lazyListState)
-    LaunchedEffect(Unit) {
-        state.animateScrollToItem(
-            if (repeated) {
-                calculateRepeatedLazyListMidIndex(
-                    index = state.initialIndex,
-                    valuesCount = state.values.size
-                )
-            } else {
-                state.initialIndex
+
+    // Update current index when visible items are changed.
+    LaunchedEffect(state) {
+        snapshotFlow { state.centralVisibleIndexLayoutInfo?.index }.collect { index ->
+            if (index != null) {
+                state.currentIndex = if (repeated) index % values.size else index
             }
-        )
+        }
     }
+
     if (repeated) {
+        // Move far from 0, because repeated list should scrollable both side.
+        LaunchedEffect(Unit) {
+            state.scrollToItem(calculateRepeatedLazyListMidIndex(
+                index = state.currentIndex,
+                valuesCount = values.size
+            ))
+        }
+
+        // Reposition position when scroll is finished.
         LaunchedEffect(state.isScrollInProgress) {
             if (!state.isScrollInProgress) {
                 state.scrollToItem(calculateRepeatedLazyListMidIndex(
-                    index = state.index,
-                    valuesCount = state.values.size
+                    index = state.currentIndex,
+                    valuesCount = values.size
                 ))
             }
         }
     }
+
     BoxWithConstraints(modifier) {
         decorationBox {
             if (isVertical) {
@@ -164,11 +172,11 @@ private fun <T> CoreSnapPicker(
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
-                                content = { itemContent(state.values[index % state.values.size]) }
+                                content = { itemContent(values[index % values.size]) }
                             )
                         }
                     } else {
-                        items(count = state.values.size) { index ->
+                        items(count = values.size) { index ->
                             Box(
                                 modifier = itemBoxModifier.pickerAlpha(
                                     isVertical = false,
@@ -176,7 +184,7 @@ private fun <T> CoreSnapPicker(
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
-                                content = { itemContent(state.values[index]) }
+                                content = { itemContent(values[index]) }
                             )
                         }
                     }
@@ -202,11 +210,11 @@ private fun <T> CoreSnapPicker(
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
-                                content = { itemContent(state.values[index % state.values.size]) }
+                                content = { itemContent(values[index % values.size]) }
                             )
                         }
                     } else {
-                        items(count = state.values.size) { index ->
+                        items(count = values.size) { index ->
                             Box(
                                 modifier = itemBoxModifier.pickerAlpha(
                                     isVertical = false,
@@ -214,7 +222,7 @@ private fun <T> CoreSnapPicker(
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
-                                content = { itemContent(state.values[index]) }
+                                content = { itemContent(values[index]) }
                             )
                         }
                     }
@@ -224,11 +232,12 @@ private fun <T> CoreSnapPicker(
     }
 }
 
+// TODO improve calculating logics
 private fun calculateRepeatedLazyListMidIndex(index: Int, valuesCount: Int): Int {
-    // TODO improve calculating logics
     return valuesCount * 1000 + index
 }
 
+// TODO improve alpha effect logics
 @OptIn(ExperimentalSnapperApi::class)
 @Stable
 private fun Modifier.pickerAlpha(

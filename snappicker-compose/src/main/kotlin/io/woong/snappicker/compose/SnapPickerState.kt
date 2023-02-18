@@ -3,57 +3,64 @@ package io.woong.snappicker.compose
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+
+/**
+ * Creates and remembers a [SnapPickerState].
+ *
+ * @param initialIndex Initial selected item index.
+ */
+@ExperimentalSnapPickerApi
+@Composable
+@Stable
+public fun rememberSnapPickerState(initialIndex: Int = 0): SnapPickerState {
+    return rememberSaveable(saver = SnapPickerState.Saver) {
+        SnapPickerState(initialIndex = initialIndex)
+    }
+}
 
 /**
  * A state object of the picker.
  *
- * @param values Possible values of this picker.
  * @param initialIndex Initial selected item index.
  */
 @ExperimentalSnapPickerApi
 @Stable
-public class SnapPickerState<T>(
-    internal val values: List<T>,
-    internal val initialIndex: Int = 0
-) : ScrollableState {
+public class SnapPickerState(internal val initialIndex: Int = 0) : ScrollableState {
+
+    internal val lazyListState = LazyListState(firstVisibleItemIndex = initialIndex)
+
+    private var _currentIndex: Int by mutableStateOf(initialIndex)
 
     /**
-     * The state for controlling internal [LazyRow][androidx.compose.foundation.lazy.LazyRow]
-     * and [LazyColumn][androidx.compose.foundation.lazy.LazyColumn].
+     * The current selected item index in the picker.
      */
-    internal val lazyListState = LazyListState()
-
-    /**
-     * The holder to store previous selected item index.
-     */
-    private var prevIndex: Int = initialIndex
-
-    /**
-     * The current selected item index.
-     */
-    public val index: Int
-        get() {
-            val visibleItemsInfo = lazyListState.layoutInfo.visibleItemsInfo
-            val centerItemInfo = visibleItemsInfo.find { it.offset in -1..1 }
-            return if (centerItemInfo != null) {
-                val newIndex = centerItemInfo.index % values.size
-                prevIndex = newIndex
-                return newIndex
-            } else {
-                prevIndex
+    public var currentIndex: Int
+        get() = _currentIndex
+        internal set(value) {
+            if (value != _currentIndex) {
+               _currentIndex = value
             }
         }
 
     /**
-     * The current selected item value.
+     * [LazyListItemInfo] of the closest to center from current visible items.
+     * If failed, return `null`.
      */
-    public val value: T
-        get() = values[index]
+    internal val centralVisibleIndexLayoutInfo: LazyListItemInfo?
+        get() {
+            val visibleItemsInfo = lazyListState.layoutInfo.visibleItemsInfo
+            if (visibleItemsInfo.isEmpty()) return null
+            return visibleItemsInfo.find { it.offset == 0 }
+        }
 
     public override val isScrollInProgress: Boolean
         get() = lazyListState.isScrollInProgress
@@ -87,41 +94,10 @@ public class SnapPickerState<T>(
         /**
          * The default saver for [SnapPickerState].
          */
-        @Suppress("UNCHECKED_CAST")
-        public fun <T> Saver(): Saver<SnapPickerState<T>, List<*>> {
-            return Saver(
-                save = { listOf(it.values, it.index) },
-                restore = {
-                    SnapPickerState(
-                        values = it[0] as List<T>,
-                        initialIndex = it[1] as Int
-                    )
-                }
-            )
-        }
-    }
-}
-
-/**
- * Creates and remembers a [SnapPickerState].
- *
- * @param values Possible values of this picker.
- * @param initialIndex Initial selected item index.
- */
-@ExperimentalSnapPickerApi
-@Composable
-@Stable
-public fun <T> rememberSnapPickerState(
-    values: List<T>,
-    initialIndex: Int = 0
-): SnapPickerState<T> {
-    return rememberSaveable(
-        inputs = arrayOf(values, initialIndex),
-        saver = SnapPickerState.Saver()
-    ) {
-        SnapPickerState(
-            values = values,
-            initialIndex = initialIndex
+        public val Saver: Saver<SnapPickerState, Int> = Saver(
+            save = { it.currentIndex },
+            restore = { SnapPickerState(initialIndex = it)
+            }
         )
     }
 }
