@@ -1,10 +1,22 @@
 package io.woong.snappicker.compose
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -110,7 +122,7 @@ private fun <T> CoreSnapPicker(
     LaunchedEffect(Unit) {
         state.animateScrollToItem(
             if (repeated) {
-                calculateAroundMidIndex(
+                calculateRepeatedLazyListMidIndex(
                     index = state.initialIndex,
                     valuesCount = state.values.size
                 )
@@ -122,7 +134,7 @@ private fun <T> CoreSnapPicker(
     if (repeated) {
         LaunchedEffect(state.isScrollInProgress) {
             if (!state.isScrollInProgress) {
-                state.scrollToItem(calculateAroundMidIndex(
+                state.scrollToItem(calculateRepeatedLazyListMidIndex(
                     index = state.index,
                     valuesCount = state.values.size
                 ))
@@ -212,8 +224,9 @@ private fun <T> CoreSnapPicker(
     }
 }
 
-private fun calculateAroundMidIndex(index: Int, valuesCount: Int): Int {
-    return ((Int.MAX_VALUE - (Int.MAX_VALUE % valuesCount)) / 2) + index
+private fun calculateRepeatedLazyListMidIndex(index: Int, valuesCount: Int): Int {
+    // TODO improve calculating logics
+    return valuesCount * 1000 + index
 }
 
 @OptIn(ExperimentalSnapperApi::class)
