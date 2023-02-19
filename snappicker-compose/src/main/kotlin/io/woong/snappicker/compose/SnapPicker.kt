@@ -104,6 +104,30 @@ public fun <T> VerticalSnapPicker(
     )
 }
 
+@ExperimentalSnapPickerApi
+@Composable
+internal fun <T> VerticalSnapPicker(
+    values: List<T>,
+    modifier: Modifier = Modifier,
+    state: SnapPickerState = rememberSnapPickerState(),
+    itemHeight: Dp = 48.dp,
+    repeated: Boolean = true,
+    decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit =
+        @Composable { innerPicker -> innerPicker() },
+    itemContent: @Composable BoxScope.(value: T) -> Unit
+) {
+    CoreSnapPicker(
+        values = values,
+        state = state,
+        isVertical = true,
+        itemSize = DpSize(width = 0.dp, height = itemHeight),
+        repeated = repeated,
+        modifier = modifier,
+        decorationBox = decorationBox,
+        itemContent = itemContent
+    )
+}
+
 @OptIn(ExperimentalSnapperApi::class)
 @ExperimentalSnapPickerApi
 @Composable
