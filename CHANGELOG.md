@@ -2,7 +2,7 @@
 
 ## 0.2.0
 
-_2023.02.dd_
+_2023.02.19_
 
 SnapPicker 0.2.0 is released.
 Version 0.2.0 contains [these commits](https://github.com/cheonjaewoong/snappicker/compare/v0.1.0...v0.2.0).
