@@ -34,7 +34,7 @@ public fun rememberSnapPickerState(initialIndex: Int = 0): SnapPickerState {
  */
 @ExperimentalSnapPickerApi
 @Stable
-public class SnapPickerState(internal val initialIndex: Int = 0) : ScrollableState {
+public class SnapPickerState(initialIndex: Int = 0) : ScrollableState {
 
     internal val lazyListState = LazyListState(firstVisibleItemIndex = initialIndex)
 
@@ -42,6 +42,7 @@ public class SnapPickerState(internal val initialIndex: Int = 0) : ScrollableSta
 
     /**
      * The current selected item index in the picker.
+     * It may not updated instantly if scroll is on progress.
      */
     public var currentIndex: Int
         get() = _currentIndex
