@@ -257,7 +257,7 @@ private fun <T> CoreSnapPicker(
 }
 
 // TODO improve calculating logics
-private fun calculateRepeatedLazyListMidIndex(index: Int, valuesCount: Int): Int {
+internal fun calculateRepeatedLazyListMidIndex(index: Int, valuesCount: Int): Int {
     return valuesCount * 1000 + index
 }
 
