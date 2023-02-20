@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.1
+
+_2023.02.20_
+
+SnapPicker 0.2.1 is released.
+Version 0.2.1 contains [these commits](https://github.com/cheonjaewoong/snappicker/compare/v0.2.0...v0.2.1).
+
+### Bug Fixes
+
+- Fix that scrolling is sometimes not working when `DateSnapPicker` have to force scrolling to the last date.
+- `rememberDateSnapPicker` and `rememberTimeSnapPicker` was recreate its state on unintended time.
+
 ## 0.2.0
 
 _2023.02.19_
