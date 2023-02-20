@@ -11,7 +11,13 @@ jobs:
     if: github.repository == 'cheonjaewoong/snappicker'
 
     steps:
+      # Extracts project version name from gradle properties
+      - name: Check version name
+        run: echo "VERSION=$(./gradlew properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
+
+      # Continue if version is not snapshot
       - name: Checkout
+        if: ${{ !endsWith(env.VERSION, 'SNAPSHOT') }}
         uses: actions/checkout@v3
 
       - name: Setup Java
