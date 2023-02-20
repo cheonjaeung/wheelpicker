@@ -34,7 +34,21 @@ public fun VerticalDateSnapPicker(
     val months = remember { (1..12).toList() }
     val dates = remember { (1..31).toList() }
 
-    // Update current date when visible items are changed.
+    // Scroll to possible last date if current date is impossible.
+    LaunchedEffect(state.isScrollInProgress) {
+        if (!state.isScrollInProgress) {
+            val currentDateIndex = state.datePickerState.currentIndex
+            val lastDateOfMonth = calculateLastDate(state.currentYear, state.currentMonth)
+            if (currentDateIndex + 1 > lastDateOfMonth) {
+                state.datePickerState.animateScrollToItem(calculateRepeatedLazyListMidIndex(
+                    index = lastDateOfMonth - 1,
+                    valuesCount = dates.size
+                ))
+            }
+        }
+    }
+
+    // Update current date when picker positions are changed.
     LaunchedEffect(
         state.yearPickerState.currentIndex,
         state.monthPickerState.currentIndex,
@@ -53,14 +67,8 @@ public fun VerticalDateSnapPicker(
             state.currentYear = years[yearIndex]
             state.currentMonth = months[monthIndex]
             val lastDateOfMonth = calculateLastDate(state.currentYear, state.currentMonth)
-            if (dates[dateIndex] > lastDateOfMonth) {
-                state.datePickerState.animateScrollToItem(calculateRepeatedLazyListMidIndex(
-                    index = lastDateOfMonth - 1,
-                    valuesCount = dates.size
-                ))
-            } else {
-                state.currentDate = dates[dateIndex]
-            }
+            // Prevent impossible date.
+            state.currentDate = dates[dateIndex].coerceIn(dates.first(), lastDateOfMonth)
         }
     }
 
