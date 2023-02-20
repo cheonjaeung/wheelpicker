@@ -25,10 +25,7 @@ public fun rememberDateSnapPickerState(
     initialMonthIndex: Int = 0,
     initialDateIndex: Int = 0
 ): DateSnapPickerState {
-    return rememberSaveable(
-        initialYearIndex, initialMonthIndex, initialDateIndex,
-        saver = DateSnapPickerState.Saver
-    ) {
+    return rememberSaveable(saver = DateSnapPickerState.Saver) {
         DateSnapPickerState(
             initialYearIndex = initialYearIndex,
             initialMonthIndex = initialMonthIndex,

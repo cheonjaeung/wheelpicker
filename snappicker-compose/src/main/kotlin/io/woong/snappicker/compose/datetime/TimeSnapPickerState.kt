@@ -27,10 +27,7 @@ public fun rememberTimeSnapPickerState(
     initialMinuteIndex: Int = 0,
     initialSecondIndex: Int = 0
 ): TimeSnapPickerState {
-    return rememberSaveable(
-        initialPeriodIndex, initialHourIndex, initialMinuteIndex, initialSecondIndex,
-        saver = TimeSnapPickerState.Saver
-    ) {
+    return rememberSaveable(saver = TimeSnapPickerState.Saver) {
         TimeSnapPickerState(
             initialPeriodIndex = initialPeriodIndex,
             initialHourIndex = initialHourIndex,
