@@ -23,6 +23,10 @@ import io.woong.snappicker.compose.VerticalSnapPicker
  * @param hourEnabled Whether the hour picker is visible.
  * @param minuteEnabled Whether the minute picker is visible.
  * @param secondEnabled Whether the second picker is visible.
+ * @param minuteInterval The interval of the minutes.
+ * This value must be a divisor of 60 (1, 2, 3, 4, 5, 6, 10, 12, 15, 20 or 30). Default is 1.
+ * @param secondInterval The interval of the seconds.
+ * This value must be a divisor of 60 (1, 2, 3, 4, 5, 6, 10, 12, 15, 20 or 30). Default is 1.
  * @param itemHeight The height size of each item composable's container.
  * @param decorationBox Composable to add decoration around pickers, such as indicator or something.
  * The actual pickers will be passed to this lambda's parameter, "innerPickers".
@@ -42,6 +46,8 @@ public fun VerticalTimeSnapPicker(
     hourEnabled: Boolean = true,
     minuteEnabled: Boolean = true,
     secondEnabled: Boolean = true,
+    minuteInterval: Int = 1,
+    secondInterval: Int = 1,
     itemHeight: Dp = 48.dp,
     decorationBox: @Composable BoxScope.(innerPickers: @Composable () -> Unit) -> Unit =
         @Composable { innerPickers -> innerPickers() },
@@ -57,8 +63,8 @@ public fun VerticalTimeSnapPicker(
             TimeFormat.Format24Hour -> (0..23).toList()
         }
     }
-    val minutes = remember { (0..59).toList() }
-    val seconds = remember { (0..59).toList() }
+    val minutes = remember { (0..59 step minuteInterval).toList() }
+    val seconds = remember { (0..59 step secondInterval).toList() }
 
     // Update current time when visible items are changed.
     LaunchedEffect(
