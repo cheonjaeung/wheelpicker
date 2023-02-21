@@ -16,12 +16,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -193,6 +193,7 @@ private fun <T> CoreSnapPicker(
                                 modifier = itemBoxModifier.pickerAlpha(
                                     isVertical = false,
                                     index = index,
+                                    itemHeight = itemSize.height,
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
@@ -205,6 +206,7 @@ private fun <T> CoreSnapPicker(
                                 modifier = itemBoxModifier.pickerAlpha(
                                     isVertical = false,
                                     index = index,
+                                    itemHeight = itemSize.height,
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
@@ -231,6 +233,7 @@ private fun <T> CoreSnapPicker(
                                 modifier = itemBoxModifier.pickerAlpha(
                                     isVertical = false,
                                     index = index,
+                                    itemHeight = itemSize.width,
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
@@ -243,6 +246,7 @@ private fun <T> CoreSnapPicker(
                                 modifier = itemBoxModifier.pickerAlpha(
                                     isVertical = false,
                                     index = index,
+                                    itemHeight = itemSize.width,
                                     lazyListState = lazyListState,
                                     snapperLayoutInfo = snapperLayoutInfo
                                 ),
@@ -261,12 +265,13 @@ internal fun calculateRepeatedLazyListMidIndex(index: Int, valuesCount: Int): In
     return valuesCount * 1000 + index
 }
 
-// TODO improve alpha effect logics
+// TODO expose alpha effect option
 @OptIn(ExperimentalSnapperApi::class)
 @Stable
 private fun Modifier.pickerAlpha(
     isVertical: Boolean,
     index: Int,
+    itemHeight: Dp,
     lazyListState: LazyListState,
     snapperLayoutInfo: LazyListSnapperLayoutInfo
 ): Modifier {
@@ -281,23 +286,13 @@ private fun Modifier.pickerAlpha(
             }
         },
         factory = {
-            val layoutInfo = remember { lazyListState.layoutInfo }
-            val visibleItemCount = layoutInfo.visibleItemsInfo.size
-            val viewPortSize: Float
-            val singleItemSize: Float
-            if (isVertical) {
-                viewPortSize = layoutInfo.viewportSize.height.toFloat()
-                singleItemSize = viewPortSize / visibleItemCount
-            } else {
-                viewPortSize = layoutInfo.viewportSize.width.toFloat()
-                singleItemSize = viewPortSize / visibleItemCount
-            }
+            val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }
             val absoluteDistanceToIndexSnap = abs(snapperLayoutInfo.distanceToIndexSnap(index))
             Modifier.alpha(
-                alpha = if (absoluteDistanceToIndexSnap < singleItemSize) {
-                    1f - (absoluteDistanceToIndexSnap / singleItemSize) + 0.66f
+                alpha = if (absoluteDistanceToIndexSnap < itemHeightPx) {
+                    1f - (absoluteDistanceToIndexSnap / itemHeightPx) + 0.25f
                 } else {
-                    (0.66f - (absoluteDistanceToIndexSnap / viewPortSize)).coerceIn(0.1f, 0.66f)
+                    0.25f
                 }
             )
         }
