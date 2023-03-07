@@ -1,8 +1,11 @@
 package io.woong.snappicker.compose.datetime
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +18,26 @@ import io.woong.snappicker.compose.ExperimentalSnapPickerApi
 import io.woong.snappicker.compose.VerticalSnapPicker
 import io.woong.snappicker.compose.calculateRepeatedLazyListMidIndex
 
+/**
+ * A date picker that allows user to select one date.
+ *
+ * @param modifier The modifier to apply to this composable.
+ * @param state The state object to manage this picker's state.
+ * @param yearEnabled Whether the year picker is visible.
+ * @param monthEnabled Whether the month picker is visible.
+ * @param dateEnabled Whether the date picker is visible.
+ * @param itemHeight The height size of each item composable's container.
+ * @param pickerSpacing The spacing between each picker.
+ * @param contentPadding Padding around the pickers. This will be applied after [decorationBox].
+ * In other word, [decorationBox] is not affected by this padding value.
+ * @param decorationBox Composable to add decoration around pickers, such as indicator or something.
+ * The actual pickers will be passed to this lambda's parameter, "innerPickers".
+ * You must call `innerPickers` to display pickers.
+ * If it is not called, the pickers never visible.
+ * @param yearItemContent The content composable of the year picker item.
+ * @param monthItemContent The content composable of the month picker item.
+ * @param dateItemContent The content composable of the date picker item.
+ */
 @ExperimentalSnapPickerApi
 @Composable
 public fun VerticalDateSnapPicker(
@@ -24,6 +47,8 @@ public fun VerticalDateSnapPicker(
     monthEnabled: Boolean = true,
     dateEnabled: Boolean = true,
     itemHeight: Dp = 48.dp,
+    pickerSpacing: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     decorationBox: @Composable BoxScope.(innerPickers: @Composable () -> Unit) -> Unit =
         @Composable { innerPickers -> innerPickers() },
     yearItemContent: @Composable BoxScope.(year: Int) -> Unit,
@@ -74,7 +99,10 @@ public fun VerticalDateSnapPicker(
 
     BoxWithConstraints(modifier) {
         decorationBox {
-            Row(modifier = Modifier.size(maxWidth, maxHeight)) {
+            Row(
+                modifier = Modifier.size(maxWidth, maxHeight).padding(contentPadding),
+                horizontalArrangement = Arrangement.spacedBy(pickerSpacing)
+            ) {
                 if (yearEnabled) {
                     VerticalSnapPicker(
                         values = years,

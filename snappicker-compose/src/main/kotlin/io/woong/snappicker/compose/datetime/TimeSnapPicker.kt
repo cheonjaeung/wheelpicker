@@ -1,8 +1,11 @@
 package io.woong.snappicker.compose.datetime
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +31,9 @@ import io.woong.snappicker.compose.VerticalSnapPicker
  * @param secondInterval The interval of the seconds.
  * This value must be a divisor of 60 (1, 2, 3, 4, 5, 6, 10, 12, 15, 20 or 30). Default is 1.
  * @param itemHeight The height size of each item composable's container.
+ * @param pickerSpacing The spacing between each picker.
+ * @param contentPadding Padding around the pickers. This will be applied after [decorationBox].
+ * In other word, [decorationBox] is not affected by this padding value.
  * @param decorationBox Composable to add decoration around pickers, such as indicator or something.
  * The actual pickers will be passed to this lambda's parameter, "innerPickers".
  * You must call `innerPickers` to display pickers.
@@ -49,6 +55,8 @@ public fun VerticalTimeSnapPicker(
     minuteInterval: Int = 1,
     secondInterval: Int = 1,
     itemHeight: Dp = 48.dp,
+    pickerSpacing: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     decorationBox: @Composable BoxScope.(innerPickers: @Composable () -> Unit) -> Unit =
         @Composable { innerPickers -> innerPickers() },
     periodItemContent: @Composable BoxScope.(period: TimePeriod) -> Unit,
@@ -122,7 +130,10 @@ public fun VerticalTimeSnapPicker(
 
     BoxWithConstraints(modifier) {
         decorationBox {
-            Row(modifier = Modifier.size(maxWidth, maxHeight)) {
+            Row(
+                modifier = Modifier.size(maxWidth, maxHeight).padding(contentPadding),
+                horizontalArrangement = Arrangement.spacedBy(pickerSpacing)
+            ) {
                 if (timeFormat == TimeFormat.Format12Hour && hourEnabled) {
                     VerticalSnapPicker(
                         values = amPm,
