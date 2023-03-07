@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.example.snappicker.databinding.FragmentBasicNumberPickerComposeSampleBinding
-import io.woong.snappicker.compose.ExperimentalSnapPickerApi
+import io.woong.snappicker.ExperimentalSnapPickerApi
 import io.woong.snappicker.compose.VerticalSnapPicker
 
 public class BasicNumberPickerComposeSample : Fragment() {

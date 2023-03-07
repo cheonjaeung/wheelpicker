@@ -14,7 +14,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.woong.snappicker.compose.ExperimentalSnapPickerApi
+import io.woong.snappicker.ExperimentalSnapPickerApi
 import io.woong.snappicker.compose.VerticalSnapPicker
 import io.woong.snappicker.compose.calculateRepeatedLazyListMidIndex
 
