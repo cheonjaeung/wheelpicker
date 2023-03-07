@@ -17,6 +17,12 @@ import androidx.compose.ui.unit.dp
 import io.woong.snappicker.compose.ExperimentalSnapPickerApi
 import io.woong.snappicker.compose.VerticalSnapPicker
 
+@Deprecated("TimeFormat is repackaged to io.woong.snappicker.datetime.TimeFormat")
+public typealias TimeFormat = io.woong.snappicker.datetime.TimeFormat
+
+@Deprecated(message = "TimePeriod is repackaged to io.woong.snappicker.datetime.TimePeriod")
+public typealias TimePeriod = io.woong.snappicker.datetime.TimePeriod
+
 /**
  * The vertical scrollable time picker that allows user to select one time from time list.
  *
