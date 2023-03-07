@@ -30,7 +30,6 @@ public class BasicNumberPickerComposeSample : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentBasicNumberPickerComposeSampleBinding.inflate(inflater, container, false)
-        binding.toolbar.setNavigationOnClickListener {}
         binding.composeView.setContent {
             SampleContent()
         }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
@@ -22,7 +23,12 @@ public class SampleListFragment : Fragment() {
         val list = binding.sampleList
         val adapter = SampleListAdapter(createSampleItems())
         adapter.setOnItemClickListener { item ->
-            findNavController().navigate(item.navDirections)
+            val direction = item.navDirections
+            if (direction != null) {
+                findNavController().navigate(direction)
+            } else {
+                Toast.makeText(requireContext(), "Not implemented yet", Toast.LENGTH_LONG).show()
+            }
         }
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -42,19 +48,19 @@ public class SampleListFragment : Fragment() {
             ),
             SampleItem(
                 "Basic Date Picker",
-                SampleListFragmentDirections.actionSampleListFragmentToBasicNumberPickerSample()
+                null
             ),
             SampleItem(
                 "Basic Date Picker\n(Jetpack Compose)",
-                SampleListFragmentDirections.actionSampleListFragmentToBasicNumberPickerSample()
+                null
             ),
             SampleItem(
                 "Basic Time Picker",
-                SampleListFragmentDirections.actionSampleListFragmentToBasicNumberPickerSample()
+                null
             ),
             SampleItem(
                 "Basic Time Picker\n(Jetpack Compose)",
-                SampleListFragmentDirections.actionSampleListFragmentToBasicNumberPickerSample()
+                null
             ),
         ))
         return samples
@@ -104,5 +110,5 @@ private class SampleItemViewHolder private constructor(
 
 private data class SampleItem(
     val title: String,
-    val navDirections: NavDirections
+    val navDirections: NavDirections?
 )
