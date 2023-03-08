@@ -14,6 +14,7 @@ public class BasicNumberPickerSample : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentBasicNumberPickerSampleBinding.inflate(inflater, container, false)
+        binding.picker.adapter.setValues((0..29).toList())
         return binding.root
     }
 }

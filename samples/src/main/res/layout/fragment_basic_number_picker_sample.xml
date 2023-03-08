@@ -4,4 +4,10 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:padding="16dp">
+
+    <io.woong.snappicker.SnapPickerView
+        android:id="@+id/picker"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center" />
 </FrameLayout>
