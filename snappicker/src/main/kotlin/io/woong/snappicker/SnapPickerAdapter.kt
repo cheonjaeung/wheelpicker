@@ -19,13 +19,15 @@ public abstract class SnapPickerAdapter<T, V : View> :
     @RecyclerView.Orientation
     internal var orientation: Int = RecyclerView.VERTICAL
 
+    internal var isCyclic: Boolean = true
+
     public fun setValues(values: List<T>) {
         this.values = values
     }
 
-    public fun getValue(position: Int): T = values[position]
+    public fun getValue(position: Int): T = values[position % values.size]
 
-    public final override fun getItemCount(): Int = values.size
+    public final override fun getItemCount(): Int = if (isCyclic) Int.MAX_VALUE else values.size
 
     public final override fun getItemViewType(position: Int): Int = super.getItemViewType(position)
 

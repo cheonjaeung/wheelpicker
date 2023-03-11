@@ -42,6 +42,15 @@ public class SnapPickerView<T> : FrameLayout {
             (recyclerView.layoutManager as LinearLayoutManager).orientation = value
         }
 
+    /**
+     * Whether this picker has infinity length or not.
+     */
+    public var isCyclic: Boolean
+        get() = adapter.isCyclic
+        set(value) {
+            adapter.isCyclic = value
+        }
+
     public constructor(context: Context) : this(context, null)
 
     public constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -60,6 +69,7 @@ public class SnapPickerView<T> : FrameLayout {
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.SnapPickerView, defStyleAttr, defStyleRes)
         val orientation = a.getInt(R.styleable.SnapPickerView_android_orientation, RecyclerView.VERTICAL)
+        val isCyclic = a.getBoolean(R.styleable.SnapPickerView_isCyclic, true)
         a.recycle()
 
         recyclerView = RecyclerView(context)
@@ -67,6 +77,7 @@ public class SnapPickerView<T> : FrameLayout {
         recyclerView.layoutManager = pickerLayoutManager
         val pickerAdapter = DefaultSnapPickerAdapter<Any>()
         pickerAdapter.orientation = orientation
+        pickerAdapter.isCyclic = isCyclic
         recyclerView.adapter = pickerAdapter
         LinearSnapHelper().attachToRecyclerView(recyclerView)
         addView(recyclerView)

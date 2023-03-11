@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="SnapPickerView">
         <attr name="android:orientation" />
+        <attr name="isCyclic" format="boolean" />
     </declare-styleable>
 </resources>
