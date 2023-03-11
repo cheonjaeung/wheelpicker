@@ -82,6 +82,8 @@ public class SnapPickerView<T> : FrameLayout {
             innerPadding = (measuredWidth / 2) - (adapter.getItemSize(context) / 2)
             recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
         }
-        recyclerView.clipToPadding = false
+        if (recyclerView.clipToPadding) {
+            recyclerView.clipToPadding = false
+        }
     }
 }
