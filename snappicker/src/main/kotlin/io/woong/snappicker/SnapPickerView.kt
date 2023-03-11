@@ -51,6 +51,8 @@ public class SnapPickerView<T> : FrameLayout {
             adapter.isCyclic = value
         }
 
+    private var onScrollListener: OnScrollListener<T>? = null
+
     public constructor(context: Context) : this(context, null)
 
     public constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -81,7 +83,20 @@ public class SnapPickerView<T> : FrameLayout {
         pickerAdapter.isCyclic = isCyclic
         recyclerView.adapter = pickerAdapter
         LinearSnapHelper().attachToRecyclerView(recyclerView)
+        attachOnScrollListenerDelegateToRecyclerView(recyclerView)
         addView(recyclerView)
+    }
+
+    private fun attachOnScrollListenerDelegateToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                onScrollListener?.onScrollStateChanged(this@SnapPickerView, newState)
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                onScrollListener?.onScrolled(this@SnapPickerView, dx, dy)
+            }
+        })
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -99,7 +114,53 @@ public class SnapPickerView<T> : FrameLayout {
         }
     }
 
+    /**
+     * Sets a [OnScrollListener] to receive scroll event.
+     */
+    public fun setOnScrollListener(onScrollListener: OnScrollListener<T>?) {
+        this.onScrollListener = onScrollListener
+    }
+
     public companion object {
         internal const val DEFAULT_MAX_ITEM_SIZE: Int = Int.MIN_VALUE
+
+        /**
+         * Scroll state constant means this picker is not currently scrolling.
+         */
+        public const val SCROLL_STATE_IDLE: Int = RecyclerView.SCROLL_STATE_IDLE
+
+        /**
+         * Scroll state constant means this picker is currently dragged.
+         */
+        public const val SCROLL_STATE_DRAGGING: Int = RecyclerView.SCROLL_STATE_DRAGGING
+
+        /**
+         * Scroll state constant means this picker is currently animating to a final
+         * position while not under outside control.
+         */
+        public const val SCROLL_STATE_SETTLING: Int = RecyclerView.SCROLL_STATE_SETTLING
+    }
+
+    /**
+     * A listener to receive [SnapPickerView]'s scroll event.
+     */
+    public open class OnScrollListener<T> {
+        /**
+         * Callback that invoked when [SnapPickerView]'s scroll state is changed.
+         *
+         * @param pickerView The picker view which scrolled.
+         * @param newState New updated scroll state.
+         */
+        public open fun onScrollStateChanged(pickerView: SnapPickerView<T>, newState: Int) {}
+
+        /**
+         * Callback that invoked when [SnapPickerView] has been scrolled. It will be called
+         * after the scroll is finished.
+         *
+         * @param pickerView The picker view which scrolled.
+         * @param dx Horizontal scroll delta.
+         * @param dy Vertical scroll delta.
+         */
+        public open fun onScrolled(pickerView: SnapPickerView<T>, dx: Int, dy: Int) {}
     }
 }
