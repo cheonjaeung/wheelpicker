@@ -3,5 +3,6 @@
     <declare-styleable name="SnapPickerView">
         <attr name="android:orientation" />
         <attr name="isCyclic" format="boolean" />
+        <attr name="maxItemSize" format="dimension" />
     </declare-styleable>
 </resources>

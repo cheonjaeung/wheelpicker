@@ -70,12 +70,13 @@ public class SnapPickerView<T> : FrameLayout {
         val a = context.obtainStyledAttributes(attrs, R.styleable.SnapPickerView, defStyleAttr, defStyleRes)
         val orientation = a.getInt(R.styleable.SnapPickerView_android_orientation, RecyclerView.VERTICAL)
         val isCyclic = a.getBoolean(R.styleable.SnapPickerView_isCyclic, true)
+        val crossAxisMaxItemSize = a.getDimensionPixelSize(R.styleable.SnapPickerView_maxItemSize, DEFAULT_MAX_ITEM_SIZE)
         a.recycle()
 
         recyclerView = RecyclerView(context)
         val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
         recyclerView.layoutManager = pickerLayoutManager
-        val pickerAdapter = DefaultSnapPickerAdapter<Any>()
+        val pickerAdapter = DefaultSnapPickerAdapter<Any>(crossAxisMaxItemSize)
         pickerAdapter.orientation = orientation
         pickerAdapter.isCyclic = isCyclic
         recyclerView.adapter = pickerAdapter
@@ -87,14 +88,18 @@ public class SnapPickerView<T> : FrameLayout {
         super.onLayout(changed, left, top, right, bottom)
         val innerPadding: Int
         if (orientation == RecyclerView.VERTICAL) {
-            innerPadding = (measuredHeight / 2) - (adapter.getItemSize(context) / 2)
+            innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
             recyclerView.setPadding(0, innerPadding, 0, innerPadding)
         } else {
-            innerPadding = (measuredWidth / 2) - (adapter.getItemSize(context) / 2)
+            innerPadding = (measuredWidth / 2) - (adapter.getMaxItemSize(context) / 2)
             recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
         }
         if (recyclerView.clipToPadding) {
             recyclerView.clipToPadding = false
         }
+    }
+
+    public companion object {
+        internal const val DEFAULT_MAX_ITEM_SIZE: Int = Int.MIN_VALUE
     }
 }

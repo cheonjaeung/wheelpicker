@@ -9,13 +9,20 @@ import kotlin.math.roundToInt
 /**
  * Default implementation of the [SnapPickerAdapter].
  */
-internal class DefaultSnapPickerAdapter<T> : SnapPickerAdapter<T, AppCompatTextView>() {
-    override fun getItemSize(context: Context): Int {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            48f,
-            context.resources.displayMetrics
-        ).roundToInt()
+internal class DefaultSnapPickerAdapter<T>(
+    private val maxItemSize: Int
+) : SnapPickerAdapter<T, AppCompatTextView>() {
+
+    override fun getMaxItemSize(context: Context): Int {
+        return if (maxItemSize == SnapPickerView.DEFAULT_MAX_ITEM_SIZE) {
+            TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                48f,
+                context.resources.displayMetrics
+            ).roundToInt()
+        } else {
+            maxItemSize
+        }
     }
 
     override fun createItemView(context: Context): AppCompatTextView {

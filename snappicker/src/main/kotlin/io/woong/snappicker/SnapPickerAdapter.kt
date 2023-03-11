@@ -34,7 +34,7 @@ public abstract class SnapPickerAdapter<T, V : View> :
     /**
      * Returns item's cross axis max size (Width when horizontal, height when vertical).
      */
-    public abstract fun getItemSize(context: Context): Int
+    public abstract fun getMaxItemSize(context: Context): Int
 
     public final override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -43,7 +43,7 @@ public abstract class SnapPickerAdapter<T, V : View> :
         return ItemContainerViewHolder.create(
             parent = parent,
             orientation = orientation,
-            crossAxisSize = getItemSize(parent.context),
+            crossAxisSize = getMaxItemSize(parent.context),
             itemView = createItemView(parent.context)
         )
     }
