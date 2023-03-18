@@ -9,5 +9,6 @@
         android:id="@+id/picker"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:background="@drawable/background_basic_number_picker" />
 </FrameLayout>

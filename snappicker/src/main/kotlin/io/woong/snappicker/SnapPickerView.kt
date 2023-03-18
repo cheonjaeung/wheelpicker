@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
  * [SnapPickerView] displays multiple items as a linear list, vertical or horizontal, with
  * snapping fling behavior.
  */
-public class SnapPickerView<T> : FrameLayout {
+public class SnapPickerView : FrameLayout {
 
     private val recyclerView: RecyclerView
 
@@ -23,10 +23,11 @@ public class SnapPickerView<T> : FrameLayout {
      * Adapter to manage child view and data.
      */
     @Suppress("UNCHECKED_CAST")
-    public var adapter: SnapPickerAdapter<T, *>
-        get() = recyclerView.adapter as SnapPickerAdapter<T, *>
+    public var adapter: SnapPickerAdapter<*, *>
+        get() = recyclerView.adapter as SnapPickerAdapter<*, *>
         set(value) {
             value.orientation = this.orientation
+            value.isCyclic = this.isCyclic
             recyclerView.adapter = value
         }
 
@@ -51,7 +52,8 @@ public class SnapPickerView<T> : FrameLayout {
             adapter.isCyclic = value
         }
 
-    private var onScrollListener: OnScrollListener<T>? = null
+    private var onScrollListener: OnScrollListener? = null
+    private var onValueSelectedListener: OnValueSelectedListener? = null
 
     public constructor(context: Context) : this(context, null)
 
@@ -83,11 +85,12 @@ public class SnapPickerView<T> : FrameLayout {
         pickerAdapter.isCyclic = isCyclic
         recyclerView.adapter = pickerAdapter
         LinearSnapHelper().attachToRecyclerView(recyclerView)
-        attachOnScrollListenerDelegateToRecyclerView(recyclerView)
+        attachOnScrollListenerToRecyclerView(recyclerView)
+        attachOnValueSelectedListenerToRecyclerView(recyclerView)
         addView(recyclerView)
     }
 
-    private fun attachOnScrollListenerDelegateToRecyclerView(recyclerView: RecyclerView) {
+    private fun attachOnScrollListenerToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 onScrollListener?.onScrollStateChanged(this@SnapPickerView, newState)
@@ -95,6 +98,23 @@ public class SnapPickerView<T> : FrameLayout {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 onScrollListener?.onScrolled(this@SnapPickerView, dx, dy)
+            }
+        })
+    }
+
+    private fun attachOnValueSelectedListenerToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == SCROLL_STATE_IDLE) {
+                    // Find visible item position methods return central position.
+                    // Because, position is calculated considering padding.
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val position = layoutManager.findFirstCompletelyVisibleItemPosition()
+                    if (position != RecyclerView.NO_POSITION) {
+                        val index = position % adapter.itemCount
+                        onValueSelectedListener?.onValueSelected(this@SnapPickerView, index)
+                    }
+                }
             }
         })
     }
@@ -117,8 +137,15 @@ public class SnapPickerView<T> : FrameLayout {
     /**
      * Sets a [OnScrollListener] to receive scroll event.
      */
-    public fun setOnScrollListener(onScrollListener: OnScrollListener<T>?) {
+    public fun setOnScrollListener(onScrollListener: OnScrollListener?) {
         this.onScrollListener = onScrollListener
+    }
+
+    /**
+     * Sets a [OnValueSelectedListener] to receive value selected event.
+     */
+    public fun setOnValueSelectedListener(onValueSelectedListener: OnValueSelectedListener?) {
+        this.onValueSelectedListener = onValueSelectedListener
     }
 
     public companion object {
@@ -144,14 +171,14 @@ public class SnapPickerView<T> : FrameLayout {
     /**
      * A listener to receive [SnapPickerView]'s scroll event.
      */
-    public open class OnScrollListener<T> {
+    public open class OnScrollListener {
         /**
          * Callback that invoked when [SnapPickerView]'s scroll state is changed.
          *
          * @param pickerView The picker view which scrolled.
          * @param newState New updated scroll state.
          */
-        public open fun onScrollStateChanged(pickerView: SnapPickerView<T>, newState: Int) {}
+        public open fun onScrollStateChanged(pickerView: SnapPickerView, newState: Int) {}
 
         /**
          * Callback that invoked when [SnapPickerView] has been scrolled. It will be called
@@ -161,6 +188,22 @@ public class SnapPickerView<T> : FrameLayout {
          * @param dx Horizontal scroll delta.
          * @param dy Vertical scroll delta.
          */
-        public open fun onScrolled(pickerView: SnapPickerView<T>, dx: Int, dy: Int) {}
+        public open fun onScrolled(pickerView: SnapPickerView, dx: Int, dy: Int) {}
+    }
+
+    /**
+     * A listener to receive picker item selected event.
+     */
+    public fun interface OnValueSelectedListener {
+        /**
+         * Callback that invoked when selected value is changed.
+         *
+         * This callback will be called when scroll is finished. It will not invoked while scroll
+         * is in progress.
+         *
+         * @param pickerView The picker view that selected value has been changed.
+         * @param index The selected item's index.
+         */
+        public fun onValueSelected(pickerView: SnapPickerView, index: Int)
     }
 }
