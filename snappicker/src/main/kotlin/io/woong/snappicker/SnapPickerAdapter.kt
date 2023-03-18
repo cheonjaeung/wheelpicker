@@ -1,9 +1,11 @@
 package io.woong.snappicker
 
 import android.content.Context
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.roundToInt
 
 /**
  * An adapter to handle picker values and item views associated with data.
@@ -31,11 +33,6 @@ public abstract class SnapPickerAdapter<T, V : View> :
 
     public final override fun getItemViewType(position: Int): Int = super.getItemViewType(position)
 
-    /**
-     * Returns item's cross axis max size (Width when horizontal, height when vertical).
-     */
-    public abstract fun getMaxItemSize(context: Context): Int
-
     public final override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -46,6 +43,18 @@ public abstract class SnapPickerAdapter<T, V : View> :
             crossAxisSize = getMaxItemSize(parent.context),
             itemView = createItemView(parent.context)
         )
+    }
+
+    /**
+     * Returns item's cross axis max size (Width when horizontal, height when vertical).
+     * Default is 48DP.
+     */
+    public open fun getMaxItemSize(context: Context): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            48f,
+            context.resources.displayMetrics
+        ).roundToInt()
     }
 
     /**
