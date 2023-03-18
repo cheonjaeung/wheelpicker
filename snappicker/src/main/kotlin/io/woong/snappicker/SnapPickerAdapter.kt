@@ -29,7 +29,17 @@ public abstract class SnapPickerAdapter<T, V : View> :
 
     public fun getValue(position: Int): T = values[position % values.size]
 
+    /**
+     * Returns the total number of items in this adapter. Note that this count is affected by
+     * cyclic option. If the picker is cyclic, it will returns [Int.MAX_VALUE].
+     */
     public final override fun getItemCount(): Int = if (isCyclic) Int.MAX_VALUE else values.size
+
+    /**
+     * Returns the total number of values in this picker. Note that this count is real values
+     * of the picker.
+     */
+    public fun getValueCount(): Int = values.size
 
     public final override fun getItemViewType(position: Int): Int = super.getItemViewType(position)
 

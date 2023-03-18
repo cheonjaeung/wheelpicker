@@ -23,12 +23,13 @@ public class SnapPickerView : FrameLayout {
      * Adapter to manage child view and data.
      */
     @Suppress("UNCHECKED_CAST")
-    public var adapter: SnapPickerAdapter<*, *>
-        get() = recyclerView.adapter as SnapPickerAdapter<*, *>
+    public var adapter: SnapPickerAdapter<*, *>? = null
         set(value) {
-            value.orientation = this.orientation
-            value.isCyclic = this.isCyclic
+            value?.orientation = this.orientation
+            value?.isCyclic = this.isCyclic
             recyclerView.adapter = value
+            field = value
+            requestLayout()
         }
 
     /**
@@ -39,17 +40,19 @@ public class SnapPickerView : FrameLayout {
     private var orientation: Int
         get() = (recyclerView.layoutManager as LinearLayoutManager).orientation
         set(value) {
-            adapter.orientation = value
+            adapter?.orientation = value
             (recyclerView.layoutManager as LinearLayoutManager).orientation = value
+            requestLayout()
         }
 
     /**
      * Whether this picker has infinity length or not.
      */
-    public var isCyclic: Boolean
-        get() = adapter.isCyclic
+    public var isCyclic: Boolean = false
         set(value) {
-            adapter.isCyclic = value
+            adapter?.isCyclic = value
+            field = value
+            requestLayout()
         }
 
     private var onScrollListener: OnScrollListener? = null
@@ -73,17 +76,12 @@ public class SnapPickerView : FrameLayout {
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.SnapPickerView, defStyleAttr, defStyleRes)
         val orientation = a.getInt(R.styleable.SnapPickerView_android_orientation, RecyclerView.VERTICAL)
-        val isCyclic = a.getBoolean(R.styleable.SnapPickerView_isCyclic, true)
-        val crossAxisMaxItemSize = a.getDimensionPixelSize(R.styleable.SnapPickerView_maxItemSize, DEFAULT_MAX_ITEM_SIZE)
+        isCyclic = a.getBoolean(R.styleable.SnapPickerView_isCyclic, true)
         a.recycle()
 
         recyclerView = RecyclerView(context)
         val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
         recyclerView.layoutManager = pickerLayoutManager
-        val pickerAdapter = DefaultSnapPickerAdapter<Any>(crossAxisMaxItemSize)
-        pickerAdapter.orientation = orientation
-        pickerAdapter.isCyclic = isCyclic
-        recyclerView.adapter = pickerAdapter
         LinearSnapHelper().attachToRecyclerView(recyclerView)
         attachOnScrollListenerToRecyclerView(recyclerView)
         attachOnValueSelectedListenerToRecyclerView(recyclerView)
@@ -105,13 +103,14 @@ public class SnapPickerView : FrameLayout {
     private fun attachOnValueSelectedListenerToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == SCROLL_STATE_IDLE) {
+                val adapter = this@SnapPickerView.adapter
+                if (adapter != null && newState == SCROLL_STATE_IDLE) {
                     // Find visible item position methods return central position.
                     // Because, position is calculated considering padding.
                     val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     val position = layoutManager.findFirstCompletelyVisibleItemPosition()
                     if (position != RecyclerView.NO_POSITION) {
-                        val index = position % adapter.itemCount
+                        val index = position % adapter.getValueCount()
                         onValueSelectedListener?.onValueSelected(this@SnapPickerView, index)
                     }
                 }
@@ -121,16 +120,19 @@ public class SnapPickerView : FrameLayout {
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        val innerPadding: Int
-        if (orientation == RecyclerView.VERTICAL) {
-            innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
-            recyclerView.setPadding(0, innerPadding, 0, innerPadding)
-        } else {
-            innerPadding = (measuredWidth / 2) - (adapter.getMaxItemSize(context) / 2)
-            recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
-        }
-        if (recyclerView.clipToPadding) {
-            recyclerView.clipToPadding = false
+        val adapter = this.adapter
+        if (adapter != null) {
+            val innerPadding: Int
+            if (orientation == RecyclerView.VERTICAL) {
+                innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
+                recyclerView.setPadding(0, innerPadding, 0, innerPadding)
+            } else {
+                innerPadding = (measuredWidth / 2) - (adapter.getMaxItemSize(context) / 2)
+                recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
+            }
+            if (recyclerView.clipToPadding) {
+                recyclerView.clipToPadding = false
+            }
         }
     }
 
@@ -149,8 +151,6 @@ public class SnapPickerView : FrameLayout {
     }
 
     public companion object {
-        internal const val DEFAULT_MAX_ITEM_SIZE: Int = Int.MIN_VALUE
-
         /**
          * Scroll state constant means this picker is not currently scrolling.
          */
@@ -176,7 +176,8 @@ public class SnapPickerView : FrameLayout {
          * Callback that invoked when [SnapPickerView]'s scroll state is changed.
          *
          * @param pickerView The picker view which scrolled.
-         * @param newState New updated scroll state.
+         * @param newState New updated scroll state, one of [SCROLL_STATE_IDLE], [SCROLL_STATE_DRAGGING]
+         * or [SCROLL_STATE_SETTLING].
          */
         public open fun onScrollStateChanged(pickerView: SnapPickerView, newState: Int) {}
 
@@ -196,10 +197,8 @@ public class SnapPickerView : FrameLayout {
      */
     public fun interface OnValueSelectedListener {
         /**
-         * Callback that invoked when selected value is changed.
-         *
-         * This callback will be called when scroll is finished. It will not invoked while scroll
-         * is in progress.
+         * Callback that invoked when selected value is changed. This callback is also called
+         * when scroll is finished.
          *
          * @param pickerView The picker view that selected value has been changed.
          * @param index The selected item's index.
