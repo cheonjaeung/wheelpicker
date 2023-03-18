@@ -22,7 +22,7 @@ public class BasicNumberPickerSample : Fragment() {
         val values = (0..99).toList()
         binding.selectedValue.text = values[0].toString()
         val adapter = BasicNumberPickerAdapter()
-        adapter.setValues(values)
+        adapter.values = values
         binding.picker.adapter = adapter
         binding.picker.setOnValueSelectedListener { _, position ->
             binding.selectedValue.text = values[position].toString()

@@ -8,25 +8,37 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.roundToInt
 
 /**
- * An adapter to handle picker values and item views associated with data.
+ * An adapter to handle data set of a [SnapPickerView] and item views associated with specified
+ * data.
  *
- * @param T Type of the item value.
- * @param V Type of the item view.
+ * To display data into item view, override [createItemView] and [bindItemView]. Create item view
+ * using [createItemView] and set on [bindItemView].
+ *
+ * All item views must have same size. To constraint item view size, it use internal item container
+ * frame. Item views should be placed into the container frame. To change max size of item view,
+ * override [getMaxItemSize] method.
  */
 public abstract class SnapPickerAdapter<T, V : View> :
     RecyclerView.Adapter<ItemContainerViewHolder<V>>() {
 
-    private var values: List<T> = emptyList()
+    internal var pickerViewRef: SnapPickerView? = null
+
+    /**
+     * Value list to display into this picker.
+     */
+    public var values: List<T> = emptyList()
 
     @RecyclerView.Orientation
-    internal var orientation: Int = RecyclerView.VERTICAL
+    private val orientation: Int
+        get() = pickerViewRef?.orientation ?: SnapPickerView.DEFAULT_ORIENTATION
 
-    internal var isCyclic: Boolean = true
+    private val isCyclic: Boolean
+        get() = pickerViewRef?.isCyclic ?: SnapPickerView.DEFAULT_CYCLIC_ENABLED
 
-    public fun setValues(values: List<T>) {
-        this.values = values
-    }
-
+    /**
+     * Returns a value at specified position. Note that it finds right value when this picker
+     * is cyclic for avoiding [IndexOutOfBoundsException].
+     */
     public fun getValue(position: Int): T = values[position % values.size]
 
     /**

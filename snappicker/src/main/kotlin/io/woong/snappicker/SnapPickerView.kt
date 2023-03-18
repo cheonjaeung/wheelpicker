@@ -13,7 +13,19 @@ import androidx.recyclerview.widget.RecyclerView
  * A scrollable picker to allow user to select one value from multiple items.
  *
  * [SnapPickerView] displays multiple items as a linear list, vertical or horizontal, with
- * snapping fling behavior.
+ * snap fling behavior. The picker scroll position will stop at specified item, not ambiguous
+ * position.
+ *
+ * This picker works with several items:
+ * - [SnapPickerView]: A view class to be placed into view hierarchy.
+ * - [SnapPickerAdapter]: An adapter class to handle data set and item view associated with
+ *   specified data.
+ * - Listeners: Listener classes or interfaces to receive specified events from this picker.
+ *
+ * To display values into picker view, at least, places a view to layout and adds adapter
+ * to the picker view. And set values to the adapter.
+ *
+ * @see SnapPickerAdapter
  */
 public class SnapPickerView : FrameLayout {
 
@@ -22,11 +34,15 @@ public class SnapPickerView : FrameLayout {
     /**
      * Adapter to manage child view and data.
      */
-    @Suppress("UNCHECKED_CAST")
     public var adapter: SnapPickerAdapter<*, *>? = null
         set(value) {
-            value?.orientation = this.orientation
-            value?.isCyclic = this.isCyclic
+            val currentAdapter = adapter
+            if (currentAdapter != null) {
+                currentAdapter.pickerViewRef = null
+            }
+            if (value != null) {
+                value.pickerViewRef = this
+            }
             recyclerView.adapter = value
             field = value
             requestLayout()
@@ -37,10 +53,9 @@ public class SnapPickerView : FrameLayout {
      * [HORIZONTAL][RecyclerView.HORIZONTAL].
      */
     @RecyclerView.Orientation
-    private var orientation: Int
+    public var orientation: Int
         get() = (recyclerView.layoutManager as LinearLayoutManager).orientation
         set(value) {
-            adapter?.orientation = value
             (recyclerView.layoutManager as LinearLayoutManager).orientation = value
             requestLayout()
         }
@@ -48,9 +63,8 @@ public class SnapPickerView : FrameLayout {
     /**
      * Whether this picker has infinity length or not.
      */
-    public var isCyclic: Boolean = false
+    public var isCyclic: Boolean = DEFAULT_CYCLIC_ENABLED
         set(value) {
-            adapter?.isCyclic = value
             field = value
             requestLayout()
         }
@@ -151,6 +165,9 @@ public class SnapPickerView : FrameLayout {
     }
 
     public companion object {
+        public const val DEFAULT_ORIENTATION: Int = RecyclerView.VERTICAL
+        public const val DEFAULT_CYCLIC_ENABLED: Boolean = false
+
         /**
          * Scroll state constant means this picker is not currently scrolling.
          */
