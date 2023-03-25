@@ -116,16 +116,24 @@ public class SnapPickerView : FrameLayout {
 
     private fun attachOnValueSelectedListenerToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            /**
+             * Previous selected value index container for avoiding unnecessary calls.
+             */
+            private var prevIndex = RecyclerView.NO_POSITION
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val adapter = this@SnapPickerView.adapter
-                if (adapter != null && newState == SCROLL_STATE_IDLE) {
+                if (adapter != null) {
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     // Find visible item position methods return central position.
                     // Because, position is calculated considering padding.
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val position = layoutManager.findFirstCompletelyVisibleItemPosition()
+                    val position = layoutManager.findFirstVisibleItemPosition()
                     if (position != RecyclerView.NO_POSITION) {
                         val index = position % adapter.getValueCount()
-                        onValueSelectedListener?.onValueSelected(this@SnapPickerView, index)
+                        if (index != prevIndex) {
+                            prevIndex = index
+                            onValueSelectedListener?.onValueSelected(this@SnapPickerView, index)
+                        }
                     }
                 }
             }
@@ -214,8 +222,7 @@ public class SnapPickerView : FrameLayout {
      */
     public fun interface OnValueSelectedListener {
         /**
-         * Callback that invoked when selected value is changed. This callback is also called
-         * when scroll is finished.
+         * Callback that invoked when selected value is changed.
          *
          * @param pickerView The picker view that selected value has been changed.
          * @param index The selected item's index.
