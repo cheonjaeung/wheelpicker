@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SnapPickerView">
+    <declare-styleable name="ValuePickerView">
         <attr name="android:orientation" />
         <attr name="isCyclic" format="boolean" />
         <attr name="maxItemSize" format="dimension" />

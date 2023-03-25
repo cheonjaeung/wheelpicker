@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import com.example.snappicker.R
 import com.example.snappicker.databinding.FragmentBasicNumberPickerSampleBinding
 import com.example.snappicker.databinding.ViewBasicNumberPickerItemBinding
-import io.woong.snappicker.SnapPickerAdapter
+import io.woong.snappicker.ValuePickerAdapter
 
 public class BasicNumberPickerSample : Fragment() {
     override fun onCreateView(
@@ -31,7 +31,7 @@ public class BasicNumberPickerSample : Fragment() {
     }
 }
 
-private class BasicNumberPickerAdapter : SnapPickerAdapter<Int, View>() {
+private class BasicNumberPickerAdapter : ValuePickerAdapter<Int, View>() {
     override fun createItemView(context: Context): View {
         val binding = ViewBasicNumberPickerItemBinding.inflate(LayoutInflater.from(context))
         return binding.root

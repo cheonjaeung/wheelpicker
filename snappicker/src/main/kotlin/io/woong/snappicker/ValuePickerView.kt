@@ -12,29 +12,29 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * A scrollable picker to allow user to select one value from multiple items.
  *
- * [SnapPickerView] displays multiple items as a linear list, vertical or horizontal, with
+ * [ValuePickerView] displays multiple items as a linear list, vertical or horizontal, with
  * snap fling behavior. The picker scroll position will stop at specified item, not ambiguous
  * position.
  *
  * This picker works with several items:
- * - [SnapPickerView]: A view class to be placed into view hierarchy.
- * - [SnapPickerAdapter]: An adapter class to handle data set and item view associated with
+ * - [ValuePickerView]: A view class to be placed into view hierarchy.
+ * - [ValuePickerAdapter]: An adapter class to handle data set and item view associated with
  *   specified data.
  * - Listeners: Listener classes or interfaces to receive specified events from this picker.
  *
  * To display values into picker view, at least, places a view to layout and adds adapter
  * to the picker view. And set values to the adapter.
  *
- * @see SnapPickerAdapter
+ * @see ValuePickerAdapter
  */
-public class SnapPickerView : FrameLayout {
+public class ValuePickerView : FrameLayout {
 
     private val recyclerView: RecyclerView
 
     /**
      * Adapter to manage child view and data.
      */
-    public var adapter: SnapPickerAdapter<*, *>? = null
+    public var adapter: ValuePickerAdapter<*, *>? = null
         set(value) {
             val currentAdapter = adapter
             if (currentAdapter != null) {
@@ -88,9 +88,9 @@ public class SnapPickerView : FrameLayout {
         @AttrRes defStyleAttr: Int,
         @StyleRes defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
-        val a = context.obtainStyledAttributes(attrs, R.styleable.SnapPickerView, defStyleAttr, defStyleRes)
-        val orientation = a.getInt(R.styleable.SnapPickerView_android_orientation, RecyclerView.VERTICAL)
-        isCyclic = a.getBoolean(R.styleable.SnapPickerView_isCyclic, true)
+        val a = context.obtainStyledAttributes(attrs, R.styleable.ValuePickerView, defStyleAttr, defStyleRes)
+        val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, RecyclerView.VERTICAL)
+        isCyclic = a.getBoolean(R.styleable.ValuePickerView_isCyclic, true)
         a.recycle()
 
         recyclerView = RecyclerView(context)
@@ -105,11 +105,11 @@ public class SnapPickerView : FrameLayout {
     private fun attachOnScrollListenerToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                onScrollListener?.onScrollStateChanged(this@SnapPickerView, newState)
+                onScrollListener?.onScrollStateChanged(this@ValuePickerView, newState)
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                onScrollListener?.onScrolled(this@SnapPickerView, dx, dy)
+                onScrollListener?.onScrolled(this@ValuePickerView, dx, dy)
             }
         })
     }
@@ -122,7 +122,7 @@ public class SnapPickerView : FrameLayout {
             private var prevIndex = RecyclerView.NO_POSITION
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val adapter = this@SnapPickerView.adapter
+                val adapter = this@ValuePickerView.adapter
                 if (adapter != null) {
                     val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     // Find visible item position methods return central position.
@@ -132,7 +132,7 @@ public class SnapPickerView : FrameLayout {
                         val index = position % adapter.getValueCount()
                         if (index != prevIndex) {
                             prevIndex = index
-                            onValueSelectedListener?.onValueSelected(this@SnapPickerView, index)
+                            onValueSelectedListener?.onValueSelected(this@ValuePickerView, index)
                         }
                     }
                 }
@@ -194,27 +194,27 @@ public class SnapPickerView : FrameLayout {
     }
 
     /**
-     * A listener to receive [SnapPickerView]'s scroll event.
+     * A listener to receive [ValuePickerView]'s scroll event.
      */
     public open class OnScrollListener {
         /**
-         * Callback that invoked when [SnapPickerView]'s scroll state is changed.
+         * Callback that invoked when [ValuePickerView]'s scroll state is changed.
          *
          * @param pickerView The picker view which scrolled.
          * @param newState New updated scroll state, one of [SCROLL_STATE_IDLE], [SCROLL_STATE_DRAGGING]
          * or [SCROLL_STATE_SETTLING].
          */
-        public open fun onScrollStateChanged(pickerView: SnapPickerView, newState: Int) {}
+        public open fun onScrollStateChanged(pickerView: ValuePickerView, newState: Int) {}
 
         /**
-         * Callback that invoked when [SnapPickerView] has been scrolled. It will be called
+         * Callback that invoked when [ValuePickerView] has been scrolled. It will be called
          * after the scroll is finished.
          *
          * @param pickerView The picker view which scrolled.
          * @param dx Horizontal scroll delta.
          * @param dy Vertical scroll delta.
          */
-        public open fun onScrolled(pickerView: SnapPickerView, dx: Int, dy: Int) {}
+        public open fun onScrolled(pickerView: ValuePickerView, dx: Int, dy: Int) {}
     }
 
     /**
@@ -227,6 +227,6 @@ public class SnapPickerView : FrameLayout {
          * @param pickerView The picker view that selected value has been changed.
          * @param index The selected item's index.
          */
-        public fun onValueSelected(pickerView: SnapPickerView, index: Int)
+        public fun onValueSelected(pickerView: ValuePickerView, index: Int)
     }
 }
