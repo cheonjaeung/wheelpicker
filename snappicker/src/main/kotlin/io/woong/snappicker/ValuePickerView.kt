@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
  * snap fling behavior. The picker scroll position will stop at specified item, not ambiguous
  * position.
  *
- * This picker works with several items:
+ * This picker works with several components:
  * - [ValuePickerView]: A view class to be placed into view hierarchy.
  * - [ValuePickerAdapter]: An adapter class to handle data set and item view associated with
  *   specified data.
@@ -30,6 +31,8 @@ import androidx.recyclerview.widget.RecyclerView
 public class ValuePickerView : FrameLayout {
 
     private val recyclerView: RecyclerView
+
+    private val recyclerViewId: Int
 
     /**
      * Adapter to manage child view and data.
@@ -94,6 +97,8 @@ public class ValuePickerView : FrameLayout {
         a.recycle()
 
         recyclerView = RecyclerView(context)
+        recyclerViewId = ViewCompat.generateViewId()
+        recyclerView.id = recyclerViewId
         val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
         recyclerView.layoutManager = pickerLayoutManager
         LinearSnapHelper().attachToRecyclerView(recyclerView)
@@ -142,6 +147,16 @@ public class ValuePickerView : FrameLayout {
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
+
+        // Move inner picker recycler view to front.
+        if (childCount > 1) {
+            val pickerView = getChildAt(0)
+            if (pickerView.id == recyclerViewId) {
+                removeViewAt(0)
+                addView(pickerView)
+            }
+        }
+
         val adapter = this.adapter
         if (adapter != null) {
             val innerPadding: Int
