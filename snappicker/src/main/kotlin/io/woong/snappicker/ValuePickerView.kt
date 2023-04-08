@@ -33,6 +33,8 @@ public class ValuePickerView : FrameLayout {
     private val recyclerView: RecyclerView
     private val recyclerViewId: Int
 
+    private val scrollEventAdapter: ScrollEventAdapter
+
     /**
      * Adapter to manage child view and data.
      */
@@ -73,9 +75,6 @@ public class ValuePickerView : FrameLayout {
             requestLayout()
         }
 
-    private var onPickerScrollListener: OnPickerScrollListener? = null
-    private var onPickerValueSelectedListener: OnPickerValueSelectedListener? = null
-
     public constructor(context: Context) : this(context, null)
 
     public constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -103,10 +102,10 @@ public class ValuePickerView : FrameLayout {
         recyclerView.id = recyclerViewId
         val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
         recyclerView.layoutManager = pickerLayoutManager
+
         LinearSnapHelper().attachToRecyclerView(recyclerView)
-        attachOnPickerScrollListenerAdapter(recyclerView)
-        attachOnPickerValueSelectedListenerAdapter(recyclerView)
-        attachCenterRepositionHelper(recyclerView)
+        scrollEventAdapter = ScrollEventAdapter(this)
+        recyclerView.addOnScrollListener(scrollEventAdapter)
         addView(recyclerView)
         postScrollToInitialPosition(initialIndex)
     }
@@ -144,80 +143,26 @@ public class ValuePickerView : FrameLayout {
         }
     }
 
-    private fun attachOnPickerScrollListenerAdapter(recyclerView: RecyclerView) {
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                onPickerScrollListener?.onScrollStateChanged(this@ValuePickerView, newState)
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                onPickerScrollListener?.onScrolled(this@ValuePickerView, dx, dy)
-            }
-        })
+    /**
+     * Sets a [OnPickerScrollListener] to receive scroll event.
+     */
+    public fun setOnPickerScrollListener(onPickerScrollListener: OnPickerScrollListener?) {
+        scrollEventAdapter.setOnPickerScrollListener(onPickerScrollListener)
     }
 
-    private fun attachOnPickerValueSelectedListenerAdapter(recyclerView: RecyclerView) {
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            private var prevIndex = RecyclerView.NO_POSITION
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val pickerAdapter = this@ValuePickerView.adapter ?: return
-                val position = findCenterItemPosition(recyclerView, pickerAdapter)
-                if (position != RecyclerView.NO_POSITION) {
-                    val index = position % pickerAdapter.getValueCount()
-                    if (index != prevIndex) {
-                        prevIndex = index
-                        onPickerValueSelectedListener?.onValueSelected(this@ValuePickerView, index)
-                    }
-                }
-            }
-
-            private fun findCenterItemPosition(
-                recyclerView: RecyclerView,
-                pickerAdapter: ValuePickerAdapter<*, *>
-            ): Int {
-                val scrollOffset = if (orientation == ORIENTATION_HORIZONTAL) {
-                    recyclerView.computeHorizontalScrollOffset().toFloat()
-                } else {
-                    recyclerView.computeVerticalScrollOffset().toFloat()
-                }
-                val itemSize = pickerAdapter.getMaxItemSize(context)
-                val centerScrollOffset = scrollOffset + (itemSize / 2)
-                return centerScrollOffset.toInt() / itemSize
-            }
-        })
-    }
-
-    private fun attachCenterRepositionHelper(recyclerView: RecyclerView) {
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == SCROLL_STATE_IDLE) {
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
-                    scrollToAdapterCenterPosition(currentPosition)
-                }
-            }
-        })
+    /**
+     * Sets a [OnPickerValueSelectedListener] to receive value selected event.
+     */
+    public fun setOnPickerValueSelectedListener(onPickerValueSelectedListener: OnPickerValueSelectedListener?) {
+        scrollEventAdapter.setOnPickerValueSelectedListener(onPickerValueSelectedListener)
     }
 
     private fun postScrollToInitialPosition(initialIndex: Int) = post {
         if (isCyclic) {
-            scrollToAdapterCenterPosition(initialIndex)
+            CenterRepositionHelper.moveToCenterPosition(this, initialIndex)
         } else {
             scrollToPosition(initialIndex)
         }
-    }
-
-    private fun scrollToAdapterCenterPosition(currentPosition: Int) {
-        if (!isCyclic) return
-        if (currentPosition == RecyclerView.NO_POSITION) return
-        val pickerAdapter = this.adapter ?: return
-
-        val valueCount = pickerAdapter.getValueCount()
-        val currentIndex = currentPosition % valueCount
-        val mod = Int.MAX_VALUE % valueCount
-        val targetPosition = (valueCount * (mod / 2)) + currentIndex
-        scrollToPosition(targetPosition)
     }
 
     /**
@@ -228,20 +173,6 @@ public class ValuePickerView : FrameLayout {
     public fun scrollToPosition(position: Int) {
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
         layoutManager.scrollToPosition(position)
-    }
-
-    /**
-     * Sets a [OnPickerScrollListener] to receive scroll event.
-     */
-    public fun setOnPickerScrollListener(onPickerScrollListener: OnPickerScrollListener?) {
-        this.onPickerScrollListener = onPickerScrollListener
-    }
-
-    /**
-     * Sets a [OnPickerValueSelectedListener] to receive value selected event.
-     */
-    public fun setOnPickerValueSelectedListener(onPickerValueSelectedListener: OnPickerValueSelectedListener?) {
-        this.onPickerValueSelectedListener = onPickerValueSelectedListener
     }
 
     public companion object {
