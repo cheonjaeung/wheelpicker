@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.RecyclerView
 public class ValuePickerView : FrameLayout {
 
     private val recyclerView: RecyclerView
-
     private val recyclerViewId: Int
 
     /**
@@ -102,9 +101,55 @@ public class ValuePickerView : FrameLayout {
         val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
         recyclerView.layoutManager = pickerLayoutManager
         LinearSnapHelper().attachToRecyclerView(recyclerView)
+        attachPositionCentralizerToRecyclerView(recyclerView)
         attachOnScrollListenerToRecyclerView(recyclerView)
         attachOnValueSelectedListenerToRecyclerView(recyclerView)
         addView(recyclerView)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+
+        // Move inner picker recycler view to front.
+        if (childCount > 1) {
+            val pickerView = getChildAt(0)
+            if (pickerView.id == recyclerViewId) {
+                removeViewAt(0)
+                addView(pickerView)
+            }
+        }
+
+        // Set padding to internal RecyclerView and set clipToPadding to false for positioning
+        // selected item view to center.
+        // If clipToPadding is false, the padding are applied but children views are not clipped.
+        // So, the first and last item can be placed on the center of RecyclerView, and padding
+        // areas can be transparent and scrollable.
+        val adapter = this.adapter
+        if (adapter != null) {
+            val innerPadding: Int
+            if (orientation == RecyclerView.VERTICAL) {
+                innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
+                recyclerView.setPadding(0, innerPadding, 0, innerPadding)
+            } else {
+                innerPadding = (measuredWidth / 2) - (adapter.getMaxItemSize(context) / 2)
+                recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
+            }
+            if (recyclerView.clipToPadding) {
+                recyclerView.clipToPadding = false
+            }
+        }
+    }
+
+    private fun attachPositionCentralizerToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == SCROLL_STATE_IDLE) {
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
+                    scrollToCentralPosition(currentPosition)
+                }
+            }
+        })
     }
 
     private fun attachOnScrollListenerToRecyclerView(recyclerView: RecyclerView) {
@@ -121,56 +166,61 @@ public class ValuePickerView : FrameLayout {
 
     private fun attachOnValueSelectedListenerToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            /**
-             * Previous selected value index container for avoiding unnecessary calls.
-             */
             private var prevIndex = RecyclerView.NO_POSITION
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val adapter = this@ValuePickerView.adapter
-                if (adapter != null) {
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    // Find visible item position methods return central position.
-                    // Because, position is calculated considering padding.
-                    val position = layoutManager.findFirstVisibleItemPosition()
-                    if (position != RecyclerView.NO_POSITION) {
-                        val index = position % adapter.getValueCount()
-                        if (index != prevIndex) {
-                            prevIndex = index
-                            onValueSelectedListener?.onValueSelected(this@ValuePickerView, index)
-                        }
+                val pickerAdapter = this@ValuePickerView.adapter ?: return
+                val position = findCenterItemPosition(recyclerView, pickerAdapter)
+                if (position != RecyclerView.NO_POSITION) {
+                    val index = position % pickerAdapter.getValueCount()
+                    if (index != prevIndex) {
+                        prevIndex = index
+                        onValueSelectedListener?.onValueSelected(this@ValuePickerView, index)
                     }
                 }
+            }
+
+            private fun findCenterItemPosition(
+                recyclerView: RecyclerView,
+                pickerAdapter: ValuePickerAdapter<*, *>
+            ): Int {
+                val scrollOffset = when (orientation) {
+                    RecyclerView.HORIZONTAL -> {
+                        recyclerView.computeHorizontalScrollOffset().toFloat()
+                    }
+                    RecyclerView.VERTICAL -> {
+                        recyclerView.computeVerticalScrollOffset().toFloat()
+                    }
+                    else -> throw IllegalStateException("Orientation value must be one of 0 or 1")
+                }
+
+                val itemSize = pickerAdapter.getMaxItemSize(context)
+                val centerScrollOffset = scrollOffset + (itemSize / 2)
+                return centerScrollOffset.toInt() / itemSize
             }
         })
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
+    private fun scrollToCentralPosition(currentPosition: Int) {
+        if (!isCyclic) return
+        if (currentPosition == RecyclerView.NO_POSITION) return
+        val adapter = this.adapter ?: return
 
-        // Move inner picker recycler view to front.
-        if (childCount > 1) {
-            val pickerView = getChildAt(0)
-            if (pickerView.id == recyclerViewId) {
-                removeViewAt(0)
-                addView(pickerView)
-            }
-        }
+        val valueCount = adapter.getValueCount()
+        val currentIndex = currentPosition % valueCount
+        val mod = Int.MAX_VALUE % valueCount
+        val targetPosition = (valueCount * (mod / 2)) + currentIndex
+        scrollToPosition(targetPosition)
+    }
 
-        val adapter = this.adapter
-        if (adapter != null) {
-            val innerPadding: Int
-            if (orientation == RecyclerView.VERTICAL) {
-                innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
-                recyclerView.setPadding(0, innerPadding, 0, innerPadding)
-            } else {
-                innerPadding = (measuredWidth / 2) - (adapter.getMaxItemSize(context) / 2)
-                recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
-            }
-            if (recyclerView.clipToPadding) {
-                recyclerView.clipToPadding = false
-            }
-        }
+    /**
+     * Move this picker's scroll position to the given position without animation.
+     *
+     * @param position The destination index.
+     */
+    public fun scrollToPosition(position: Int) {
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        layoutManager.scrollToPosition(position)
     }
 
     /**
