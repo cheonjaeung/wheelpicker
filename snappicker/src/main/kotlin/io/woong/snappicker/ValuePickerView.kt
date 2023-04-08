@@ -91,7 +91,7 @@ public class ValuePickerView : FrameLayout {
         @StyleRes defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.ValuePickerView, defStyleAttr, defStyleRes)
-        val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, RecyclerView.VERTICAL)
+        val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, ORIENTATION_VERTICAL)
         isCyclic = a.getBoolean(R.styleable.ValuePickerView_isCyclic, true)
         a.recycle()
 
@@ -127,7 +127,7 @@ public class ValuePickerView : FrameLayout {
         val adapter = this.adapter
         if (adapter != null) {
             val innerPadding: Int
-            if (orientation == RecyclerView.VERTICAL) {
+            if (orientation == ORIENTATION_VERTICAL) {
                 innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
                 recyclerView.setPadding(0, innerPadding, 0, innerPadding)
             } else {
@@ -184,16 +184,11 @@ public class ValuePickerView : FrameLayout {
                 recyclerView: RecyclerView,
                 pickerAdapter: ValuePickerAdapter<*, *>
             ): Int {
-                val scrollOffset = when (orientation) {
-                    RecyclerView.HORIZONTAL -> {
-                        recyclerView.computeHorizontalScrollOffset().toFloat()
-                    }
-                    RecyclerView.VERTICAL -> {
-                        recyclerView.computeVerticalScrollOffset().toFloat()
-                    }
-                    else -> throw IllegalStateException("Orientation value must be one of 0 or 1")
+                val scrollOffset = if (orientation == ORIENTATION_HORIZONTAL) {
+                    recyclerView.computeHorizontalScrollOffset().toFloat()
+                } else {
+                    recyclerView.computeVerticalScrollOffset().toFloat()
                 }
-
                 val itemSize = pickerAdapter.getMaxItemSize(context)
                 val centerScrollOffset = scrollOffset + (itemSize / 2)
                 return centerScrollOffset.toInt() / itemSize
@@ -238,7 +233,10 @@ public class ValuePickerView : FrameLayout {
     }
 
     public companion object {
-        public const val DEFAULT_ORIENTATION: Int = RecyclerView.VERTICAL
+        public const val ORIENTATION_HORIZONTAL: Int = RecyclerView.HORIZONTAL
+        public const val ORIENTATION_VERTICAL: Int = RecyclerView.VERTICAL
+        public const val DEFAULT_ORIENTATION: Int = ORIENTATION_VERTICAL
+
         public const val DEFAULT_CYCLIC_ENABLED: Boolean = false
 
         /**
