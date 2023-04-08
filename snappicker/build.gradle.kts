@@ -27,7 +27,7 @@ android {
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    api("androidx.recyclerview:recyclerview:1.2.1")
 }
 
 mavenPublishing {
