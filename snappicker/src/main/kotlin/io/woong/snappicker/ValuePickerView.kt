@@ -57,7 +57,7 @@ public class ValuePickerView : FrameLayout {
     public var orientation: Int
         get() = (recyclerView.layoutManager as LinearLayoutManager).orientation
         set(value) {
-            if (value != ORIENTATION_HORIZONTAL || value != ORIENTATION_VERTICAL) {
+            if (value != ORIENTATION_HORIZONTAL && value != ORIENTATION_VERTICAL) {
                 throw IllegalArgumentException("Orientation value must be one of 0 or 1")
             }
             (recyclerView.layoutManager as LinearLayoutManager).orientation = value
