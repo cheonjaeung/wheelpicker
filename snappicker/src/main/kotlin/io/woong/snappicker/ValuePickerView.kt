@@ -51,13 +51,15 @@ public class ValuePickerView : FrameLayout {
         }
 
     /**
-     * Orientation of this picker. Either [VERTICAL][RecyclerView.VERTICAL] or
-     * [HORIZONTAL][RecyclerView.HORIZONTAL].
+     * Orientation of this picker. Either [ORIENTATION_VERTICAL] or [ORIENTATION_HORIZONTAL].
      */
     @RecyclerView.Orientation
     public var orientation: Int
         get() = (recyclerView.layoutManager as LinearLayoutManager).orientation
         set(value) {
+            if (value != ORIENTATION_HORIZONTAL || value != ORIENTATION_VERTICAL) {
+                throw IllegalArgumentException("Orientation value must be one of 0 or 1")
+            }
             (recyclerView.layoutManager as LinearLayoutManager).orientation = value
             requestLayout()
         }
@@ -102,9 +104,9 @@ public class ValuePickerView : FrameLayout {
         val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
         recyclerView.layoutManager = pickerLayoutManager
         LinearSnapHelper().attachToRecyclerView(recyclerView)
-        attachPositionCentralizerToRecyclerView(recyclerView)
-        attachOnScrollListenerToRecyclerView(recyclerView)
-        attachOnValueSelectedListenerToRecyclerView(recyclerView)
+        attachOnPickerScrollListenerAdapter(recyclerView)
+        attachOnPickerValueSelectedListenerAdapter(recyclerView)
+        attachCenterRepositionHelper(recyclerView)
         addView(recyclerView)
         postScrollToInitialPosition(initialIndex)
     }
@@ -142,19 +144,7 @@ public class ValuePickerView : FrameLayout {
         }
     }
 
-    private fun attachPositionCentralizerToRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == SCROLL_STATE_IDLE) {
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
-                    scrollToAdapterCenterPosition(currentPosition)
-                }
-            }
-        })
-    }
-
-    private fun attachOnScrollListenerToRecyclerView(recyclerView: RecyclerView) {
+    private fun attachOnPickerScrollListenerAdapter(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 onPickerScrollListener?.onScrollStateChanged(this@ValuePickerView, newState)
@@ -166,7 +156,7 @@ public class ValuePickerView : FrameLayout {
         })
     }
 
-    private fun attachOnValueSelectedListenerToRecyclerView(recyclerView: RecyclerView) {
+    private fun attachOnPickerValueSelectedListenerAdapter(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             private var prevIndex = RecyclerView.NO_POSITION
 
@@ -194,6 +184,18 @@ public class ValuePickerView : FrameLayout {
                 val itemSize = pickerAdapter.getMaxItemSize(context)
                 val centerScrollOffset = scrollOffset + (itemSize / 2)
                 return centerScrollOffset.toInt() / itemSize
+            }
+        })
+    }
+
+    private fun attachCenterRepositionHelper(recyclerView: RecyclerView) {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == SCROLL_STATE_IDLE) {
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
+                    scrollToAdapterCenterPosition(currentPosition)
+                }
             }
         })
     }
@@ -245,9 +247,6 @@ public class ValuePickerView : FrameLayout {
     public companion object {
         public const val ORIENTATION_HORIZONTAL: Int = RecyclerView.HORIZONTAL
         public const val ORIENTATION_VERTICAL: Int = RecyclerView.VERTICAL
-        public const val DEFAULT_ORIENTATION: Int = ORIENTATION_VERTICAL
-
-        public const val DEFAULT_CYCLIC_ENABLED: Boolean = false
 
         /**
          * Scroll state constant means this picker is not currently scrolling.
@@ -261,8 +260,11 @@ public class ValuePickerView : FrameLayout {
 
         /**
          * Scroll state constant means this picker is currently animating to a final
-         * position while not under outside control.
+         * position after drag finished.
          */
         public const val SCROLL_STATE_SETTLING: Int = RecyclerView.SCROLL_STATE_SETTLING
+
+        public const val DEFAULT_ORIENTATION: Int = ORIENTATION_VERTICAL
+        public const val DEFAULT_CYCLIC_ENABLED: Boolean = false
     }
 }
