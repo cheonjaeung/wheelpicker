@@ -146,7 +146,7 @@ public class ValuePickerView : FrameLayout {
                 if (newState == SCROLL_STATE_IDLE) {
                     val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
-                    scrollToCentralPosition(currentPosition)
+                    scrollToAdapterCenterPosition(currentPosition)
                 }
             }
         })
@@ -196,12 +196,13 @@ public class ValuePickerView : FrameLayout {
         })
     }
 
-    private fun scrollToCentralPosition(currentPosition: Int) {
+
+    private fun scrollToAdapterCenterPosition(currentPosition: Int) {
         if (!isCyclic) return
         if (currentPosition == RecyclerView.NO_POSITION) return
-        val adapter = this.adapter ?: return
+        val pickerAdapter = this.adapter ?: return
 
-        val valueCount = adapter.getValueCount()
+        val valueCount = pickerAdapter.getValueCount()
         val currentIndex = currentPosition % valueCount
         val mod = Int.MAX_VALUE % valueCount
         val targetPosition = (valueCount * (mod / 2)) + currentIndex
