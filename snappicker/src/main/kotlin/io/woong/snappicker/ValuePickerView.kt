@@ -93,6 +93,7 @@ public class ValuePickerView : FrameLayout {
         val a = context.obtainStyledAttributes(attrs, R.styleable.ValuePickerView, defStyleAttr, defStyleRes)
         val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, ORIENTATION_VERTICAL)
         isCyclic = a.getBoolean(R.styleable.ValuePickerView_isCyclic, true)
+        val initialIndex = a.getInt(R.styleable.ValuePickerView_initialIndex, 0)
         a.recycle()
 
         recyclerView = RecyclerView(context)
@@ -105,6 +106,7 @@ public class ValuePickerView : FrameLayout {
         attachOnScrollListenerToRecyclerView(recyclerView)
         attachOnValueSelectedListenerToRecyclerView(recyclerView)
         addView(recyclerView)
+        postScrollToInitialPosition(initialIndex)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -196,6 +198,13 @@ public class ValuePickerView : FrameLayout {
         })
     }
 
+    private fun postScrollToInitialPosition(initialIndex: Int) = post {
+        if (isCyclic) {
+            scrollToAdapterCenterPosition(initialIndex)
+        } else {
+            scrollToPosition(initialIndex)
+        }
+    }
 
     private fun scrollToAdapterCenterPosition(currentPosition: Int) {
         if (!isCyclic) return

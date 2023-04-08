@@ -3,6 +3,7 @@
     <declare-styleable name="ValuePickerView">
         <attr name="android:orientation" />
         <attr name="isCyclic" format="boolean" />
+        <attr name="initialIndex" format="integer" />
         <attr name="itemWidth" format="dimension" />
         <attr name="itemHeight" format="dimension" />
     </declare-styleable>
