@@ -71,8 +71,8 @@ public class ValuePickerView : FrameLayout {
             requestLayout()
         }
 
-    private var onScrollListener: OnScrollListener? = null
-    private var onValueSelectedListener: OnValueSelectedListener? = null
+    private var onPickerScrollListener: OnPickerScrollListener? = null
+    private var onPickerValueSelectedListener: OnPickerValueSelectedListener? = null
 
     public constructor(context: Context) : this(context, null)
 
@@ -155,11 +155,11 @@ public class ValuePickerView : FrameLayout {
     private fun attachOnScrollListenerToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                onScrollListener?.onScrollStateChanged(this@ValuePickerView, newState)
+                onPickerScrollListener?.onScrollStateChanged(this@ValuePickerView, newState)
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                onScrollListener?.onScrolled(this@ValuePickerView, dx, dy)
+                onPickerScrollListener?.onScrolled(this@ValuePickerView, dx, dy)
             }
         })
     }
@@ -175,7 +175,7 @@ public class ValuePickerView : FrameLayout {
                     val index = position % pickerAdapter.getValueCount()
                     if (index != prevIndex) {
                         prevIndex = index
-                        onValueSelectedListener?.onValueSelected(this@ValuePickerView, index)
+                        onPickerValueSelectedListener?.onValueSelected(this@ValuePickerView, index)
                     }
                 }
             }
@@ -224,17 +224,17 @@ public class ValuePickerView : FrameLayout {
     }
 
     /**
-     * Sets a [OnScrollListener] to receive scroll event.
+     * Sets a [OnPickerScrollListener] to receive scroll event.
      */
-    public fun setOnScrollListener(onScrollListener: OnScrollListener?) {
-        this.onScrollListener = onScrollListener
+    public fun setOnPickerScrollListener(onPickerScrollListener: OnPickerScrollListener?) {
+        this.onPickerScrollListener = onPickerScrollListener
     }
 
     /**
-     * Sets a [OnValueSelectedListener] to receive value selected event.
+     * Sets a [OnPickerValueSelectedListener] to receive value selected event.
      */
-    public fun setOnValueSelectedListener(onValueSelectedListener: OnValueSelectedListener?) {
-        this.onValueSelectedListener = onValueSelectedListener
+    public fun setOnPickerValueSelectedListener(onPickerValueSelectedListener: OnPickerValueSelectedListener?) {
+        this.onPickerValueSelectedListener = onPickerValueSelectedListener
     }
 
     public companion object {
@@ -256,42 +256,5 @@ public class ValuePickerView : FrameLayout {
          * position while not under outside control.
          */
         public const val SCROLL_STATE_SETTLING: Int = RecyclerView.SCROLL_STATE_SETTLING
-    }
-
-    /**
-     * A listener to receive [ValuePickerView]'s scroll event.
-     */
-    public open class OnScrollListener {
-        /**
-         * Callback that invoked when [ValuePickerView]'s scroll state is changed.
-         *
-         * @param pickerView The picker view which scrolled.
-         * @param newState New updated scroll state, one of [SCROLL_STATE_IDLE], [SCROLL_STATE_DRAGGING]
-         * or [SCROLL_STATE_SETTLING].
-         */
-        public open fun onScrollStateChanged(pickerView: ValuePickerView, newState: Int) {}
-
-        /**
-         * Callback that invoked when [ValuePickerView] has been scrolled. It will be called
-         * after the scroll is finished.
-         *
-         * @param pickerView The picker view which scrolled.
-         * @param dx Horizontal scroll delta.
-         * @param dy Vertical scroll delta.
-         */
-        public open fun onScrolled(pickerView: ValuePickerView, dx: Int, dy: Int) {}
-    }
-
-    /**
-     * A listener to receive picker item selected event.
-     */
-    public fun interface OnValueSelectedListener {
-        /**
-         * Callback that invoked when selected value is changed.
-         *
-         * @param pickerView The picker view that selected value has been changed.
-         * @param index The selected item's index.
-         */
-        public fun onValueSelected(pickerView: ValuePickerView, index: Int)
     }
 }

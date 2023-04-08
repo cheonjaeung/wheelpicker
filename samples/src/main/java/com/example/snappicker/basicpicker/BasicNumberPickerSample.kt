@@ -19,12 +19,13 @@ public class BasicNumberPickerSample : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentBasicNumberPickerSampleBinding.inflate(inflater, container, false)
-        val values = (0..99).toList()
+        val values = (0..24).toList()
         binding.selectedValue.text = values[0].toString()
         val adapter = BasicNumberPickerAdapter()
         adapter.values = values
         binding.picker.adapter = adapter
-        binding.picker.setOnValueSelectedListener { _, position ->
+        binding.picker.isCyclic = true
+        binding.picker.setOnPickerValueSelectedListener { _, position ->
             binding.selectedValue.text = values[position].toString()
         }
         return binding.root
