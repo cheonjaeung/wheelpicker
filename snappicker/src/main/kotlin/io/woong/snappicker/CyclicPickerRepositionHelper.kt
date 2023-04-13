@@ -2,7 +2,7 @@ package io.woong.snappicker
 
 import androidx.recyclerview.widget.RecyclerView
 
-internal object CenterRepositionHelper {
+internal object CyclicPickerRepositionHelper {
     fun moveToCenterPosition(pickerView: ValuePickerView, currentPosition: Int) {
         if (currentPosition == RecyclerView.NO_POSITION) return
         if (!pickerView.isCyclic) return
