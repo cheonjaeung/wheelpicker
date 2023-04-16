@@ -30,7 +30,9 @@ internal class ScrollEventAdapter(
         if (newState == ValuePickerView.SCROLL_STATE_IDLE) {
             val layoutManager  = recyclerView.layoutManager as LinearLayoutManager
             val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
-            CyclicPickerRepositionHelper.moveToCenterPosition(pickerView, currentPosition)
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                CyclicPickerRepositionHelper.moveToCenterPosition(pickerView, currentPosition)
+            }
         }
     }
 
