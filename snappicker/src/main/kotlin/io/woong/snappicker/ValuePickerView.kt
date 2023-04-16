@@ -159,7 +159,8 @@ public class ValuePickerView : FrameLayout {
 
     private fun postScrollToInitialPosition(initialIndex: Int) = post {
         if (isCyclic) {
-            CyclicPickerRepositionHelper.moveToCenterPosition(this, initialIndex)
+            val aroundCenterPosition = scrollEventAdapter.findRepositionablePosition(initialIndex)
+            scrollToPosition(aroundCenterPosition)
         } else {
             scrollToPosition(initialIndex)
         }

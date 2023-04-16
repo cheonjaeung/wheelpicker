@@ -16,11 +16,11 @@ internal class ScrollEventAdapter(
 
     private var previousCenterValueIndex: Int = NO_POSITION
 
-    fun setOnPickerScrollListener(listener: OnPickerScrollListener?) {
+    internal fun setOnPickerScrollListener(listener: OnPickerScrollListener?) {
         this.onPickerScrollListener = listener
     }
 
-    fun setOnPickerValueSelectedListener(listener: OnPickerValueSelectedListener?) {
+    internal fun setOnPickerValueSelectedListener(listener: OnPickerValueSelectedListener?) {
         this.onPickerValueSelectedListener = listener
     }
 
@@ -31,7 +31,8 @@ internal class ScrollEventAdapter(
             val layoutManager  = recyclerView.layoutManager as LinearLayoutManager
             val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
             if (currentPosition != RecyclerView.NO_POSITION) {
-                CyclicPickerRepositionHelper.moveToCenterPosition(pickerView, currentPosition)
+                val repositionTargetPosition = findRepositionablePosition(currentPosition)
+                pickerView.scrollToPosition(repositionTargetPosition)
             }
         }
     }
@@ -48,6 +49,31 @@ internal class ScrollEventAdapter(
                 onPickerValueSelectedListener?.onValueSelected(pickerView, centerValueIndex)
             }
         }
+    }
+
+    /**
+     * Returns around center position based on given current position for repositioning.
+     *
+     * A picker which enabled cyclic option has large size of items (Int.MAX_VALUE) for infinite
+     * scrolling. To make user feel infinite items, current adapter position should be on around
+     * center of adapter (around half of Int.MAX_VALUE). It calculates correct index to reposition
+     * when scroll is idle, and move to the index.
+     */
+    internal fun findRepositionablePosition(currentPosition: Int): Int {
+        if (currentPosition == RecyclerView.NO_POSITION) {
+            return RecyclerView.NO_POSITION
+        }
+        if (!pickerView.isCyclic) {
+            return currentPosition
+        }
+        val pickerAdapter = pickerView.adapter ?: return RecyclerView.NO_POSITION
+
+        val adapterItemCount = pickerAdapter.itemCount
+        val valueCount = pickerAdapter.getValueCount()
+        val chunkCount = adapterItemCount / valueCount
+        val currentValueIndex = currentPosition % valueCount
+        val aroundCenterChunkFirstIndex = valueCount * (chunkCount / 2)
+        return aroundCenterChunkFirstIndex + currentValueIndex
     }
 
     /**
