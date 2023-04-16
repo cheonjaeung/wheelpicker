@@ -10,7 +10,7 @@ plugins {
 
 allprojects {
     group = "io.woong.snappicker"
-    version = "0.3.0-SNAPSHOT"
+    version = "1.0.0-SNAPSHOT"
 
     repositories {
         google()
