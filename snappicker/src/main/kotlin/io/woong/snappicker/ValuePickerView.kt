@@ -93,7 +93,7 @@ public class ValuePickerView : FrameLayout {
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.ValuePickerView, defStyleAttr, defStyleRes)
         val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, ORIENTATION_VERTICAL)
-        isCyclic = a.getBoolean(R.styleable.ValuePickerView_isCyclic, true)
+        isCyclic = a.getBoolean(R.styleable.ValuePickerView_isCyclic, DEFAULT_CYCLIC_ENABLED)
         val initialIndex = a.getInt(R.styleable.ValuePickerView_initialIndex, 0)
         a.recycle()
 
