@@ -1,5 +1,8 @@
 package io.woong.snappicker
 
+import android.graphics.Point
+import android.graphics.Rect
+import androidx.core.graphics.contains
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -14,7 +17,7 @@ internal class ScrollEventAdapter(
     private var onPickerScrollListener: OnPickerScrollListener? = null
     private var onPickerValueSelectedListener: OnPickerValueSelectedListener? = null
 
-    private var previousCenterValueIndex: Int = NO_POSITION
+    private var previousCenterValueIndex: Int = RecyclerView.NO_POSITION
 
     internal fun setOnPickerScrollListener(listener: OnPickerScrollListener?) {
         this.onPickerScrollListener = listener
@@ -42,11 +45,13 @@ internal class ScrollEventAdapter(
 
         val pickerAdapter = pickerView.adapter
         if (pickerAdapter != null) {
-            val centerPosition = findCenterItemPosition(recyclerView, pickerAdapter)
-            val centerValueIndex = centerPosition % pickerAdapter.getValueCount()
-            if (centerValueIndex != previousCenterValueIndex) {
-                previousCenterValueIndex = centerValueIndex
-                onPickerValueSelectedListener?.onValueSelected(pickerView, centerValueIndex)
+            val centerPosition = findClosestToCenterItemPosition(recyclerView)
+            if (centerPosition != RecyclerView.NO_POSITION) {
+                val centerValueIndex = centerPosition % pickerAdapter.getValueCount()
+                if (centerValueIndex != previousCenterValueIndex) {
+                    previousCenterValueIndex = centerValueIndex
+                    onPickerValueSelectedListener?.onValueSelected(pickerView, centerValueIndex)
+                }
             }
         }
     }
@@ -77,24 +82,37 @@ internal class ScrollEventAdapter(
     }
 
     /**
-     * Returns an item position at the center of picker view by calculating scroll offset
-     * and view sizes.
+     * Returns an item position that is the closest to picker view center.
      */
-    private fun findCenterItemPosition(
-        recyclerView: RecyclerView,
-        pickerAdapter: ValuePickerAdapter<*, *>
-    ): Int {
-        val scrollOffset = if (pickerView.orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-            recyclerView.computeHorizontalScrollOffset().toFloat()
-        } else {
-            recyclerView.computeVerticalScrollOffset().toFloat()
-        }
-        val itemSize = pickerAdapter.getMaxItemSize(recyclerView.context)
-        val centerScrollOffset = scrollOffset + (itemSize / 2)
-        return centerScrollOffset.toInt() / itemSize
-    }
+    private fun findClosestToCenterItemPosition(recyclerView: RecyclerView): Int {
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
+        val firstVisibleItemView = layoutManager.findViewByPosition(firstVisiblePosition)
+            ?: return RecyclerView.NO_POSITION
+        val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
+        val lastVisibleItemView = layoutManager.findViewByPosition(lastVisiblePosition)
+            ?: return RecyclerView.NO_POSITION
 
-    companion object {
-        private const val NO_POSITION: Int = -1
+        val firstItemViewGlobalBounds = Rect()
+        if (!firstVisibleItemView.getGlobalVisibleRect(firstItemViewGlobalBounds)) {
+            return RecyclerView.NO_POSITION
+        }
+        val lastItemViewGlobalBounds = Rect()
+        if (!lastVisibleItemView.getGlobalVisibleRect(lastItemViewGlobalBounds)) {
+            return RecyclerView.NO_POSITION
+        }
+        val recyclerViewGlobalBounds = Rect()
+        if (!recyclerView.getGlobalVisibleRect(recyclerViewGlobalBounds)) {
+            return RecyclerView.NO_POSITION
+        }
+
+        val recyclerViewCenter = if (pickerView.orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
+            Point(recyclerViewGlobalBounds.centerX(), recyclerViewGlobalBounds.centerY())
+        } else {
+            Point(recyclerViewGlobalBounds.centerX(), recyclerViewGlobalBounds.centerY())
+        }
+        val isFirstCloserThanLast: Boolean = firstItemViewGlobalBounds.contains(recyclerViewCenter)
+
+        return if (isFirstCloserThanLast) firstVisiblePosition else lastVisiblePosition
     }
 }
