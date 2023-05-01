@@ -37,6 +37,7 @@ public class ValuePickerView : FrameLayout {
     private val scrollListenerAdapter: ScrollListenerAdapter
     private val valueSelectedListenerAdapter: ValueSelectedListenerAdapter
     private val cyclicPickerRepositionHelper: CyclicPickerRepositionHelper
+    private val alphaEffector: AlphaEffector
 
     /**
      * Adapter to manage child view and data.
@@ -110,10 +111,12 @@ public class ValuePickerView : FrameLayout {
         scrollListenerAdapter = ScrollListenerAdapter()
         valueSelectedListenerAdapter = ValueSelectedListenerAdapter()
         cyclicPickerRepositionHelper = CyclicPickerRepositionHelper()
+        alphaEffector = AlphaEffector()
         snapHelper.attachToRecyclerView(recyclerView)
         scrollListenerAdapter.attachToPickerView(this)
         valueSelectedListenerAdapter.attachToPickerView(this)
         cyclicPickerRepositionHelper.attachToPickerView(this)
+        alphaEffector.attachToPickerView(this)
 
         addView(recyclerView)
         postMoveToInitialPosition(initialIndex)
