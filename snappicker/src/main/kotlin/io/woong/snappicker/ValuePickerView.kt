@@ -2,6 +2,8 @@ package io.woong.snappicker
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -9,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.roundToInt
 
 /**
  * A scrollable picker to allow user to select one value from multiple items.
@@ -46,10 +49,10 @@ public class ValuePickerView : FrameLayout {
         set(value) {
             val currentAdapter = adapter
             if (currentAdapter != null) {
-                currentAdapter.pickerViewRef = null
+                currentAdapter.pickerView = null
             }
             if (value != null) {
-                value.pickerViewRef = this
+                value.pickerView = this
             }
             recyclerView.adapter = value
             field = value
@@ -67,6 +70,24 @@ public class ValuePickerView : FrameLayout {
                 throw IllegalArgumentException("Orientation value must be one of 0 or 1")
             }
             (recyclerView.layoutManager as LinearLayoutManager).orientation = value
+            requestLayout()
+        }
+
+    /**
+     * Picker item view's maximum width size in pixel unit.
+     */
+    public var itemWidth: Int = getDefaultItemSize(resources.displayMetrics)
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
+    /**
+     * Picker item view's maximum height size in pixel unit.
+     */
+    public var itemHeight: Int = getDefaultItemSize(resources.displayMetrics)
+        set(value) {
+            field = value
             requestLayout()
         }
 
@@ -97,6 +118,14 @@ public class ValuePickerView : FrameLayout {
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.ValuePickerView, defStyleAttr, defStyleRes)
         val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, ORIENTATION_VERTICAL)
+        itemWidth = a.getDimensionPixelSize(
+            R.styleable.ValuePickerView_itemWidth,
+            getDefaultItemSize(resources.displayMetrics)
+        )
+        itemHeight = a.getDimensionPixelSize(
+            R.styleable.ValuePickerView_itemHeight,
+            getDefaultItemSize(resources.displayMetrics)
+        )
         isCyclic = a.getBoolean(R.styleable.ValuePickerView_isCyclic, DEFAULT_CYCLIC_ENABLED)
         val initialIndex = a.getInt(R.styleable.ValuePickerView_initialIndex, 0)
         a.recycle()
@@ -152,10 +181,10 @@ public class ValuePickerView : FrameLayout {
         if (adapter != null) {
             val innerPadding: Int
             if (orientation == ORIENTATION_VERTICAL) {
-                innerPadding = (measuredHeight / 2) - (adapter.getMaxItemSize(context) / 2)
+                innerPadding = (measuredHeight / 2) - (itemHeight / 2)
                 recyclerView.setPadding(0, innerPadding, 0, innerPadding)
             } else {
-                innerPadding = (measuredWidth / 2) - (adapter.getMaxItemSize(context) / 2)
+                innerPadding = (measuredWidth / 2) - (itemWidth / 2)
                 recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
             }
             if (recyclerView.clipToPadding) {
@@ -217,6 +246,14 @@ public class ValuePickerView : FrameLayout {
 
         public const val DEFAULT_ORIENTATION: Int = ORIENTATION_VERTICAL
         public const val DEFAULT_CYCLIC_ENABLED: Boolean = false
+
+        internal fun getDefaultItemSize(displayMetrics: DisplayMetrics): Int {
+            return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                48f,
+                displayMetrics
+            ).roundToInt()
+        }
     }
 
     /**

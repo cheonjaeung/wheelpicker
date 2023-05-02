@@ -1,11 +1,9 @@
 package io.woong.snappicker
 
 import android.content.Context
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.math.roundToInt
 
 /**
  * An adapter to handle data set of a [ValuePickerView] and item views associated with specified
@@ -13,15 +11,11 @@ import kotlin.math.roundToInt
  *
  * To display data into item view, override [createItemView] and [bindItemView]. Create item view
  * using [createItemView] and set on [bindItemView].
- *
- * All item views must have same size. To constraint item view size, it use internal item container
- * frame. Item views should be placed into the container frame. To change max size of item view,
- * override [getMaxItemSize] method.
  */
 public abstract class ValuePickerAdapter<T, V : View> :
     RecyclerView.Adapter<ItemContainerViewHolder<V>>() {
 
-    internal var pickerViewRef: ValuePickerView? = null
+    internal var pickerView: ValuePickerView? = null
 
     /**
      * Value list to display into this picker.
@@ -30,10 +24,10 @@ public abstract class ValuePickerAdapter<T, V : View> :
 
     @RecyclerView.Orientation
     private val orientation: Int
-        get() = pickerViewRef?.orientation ?: ValuePickerView.DEFAULT_ORIENTATION
+        get() = pickerView?.orientation ?: ValuePickerView.DEFAULT_ORIENTATION
 
     private val isCyclic: Boolean
-        get() = pickerViewRef?.isCyclic ?: ValuePickerView.DEFAULT_CYCLIC_ENABLED
+        get() = pickerView?.isCyclic ?: ValuePickerView.DEFAULT_CYCLIC_ENABLED
 
     /**
      * Returns a value at specified position. Note that it finds right value when this picker
@@ -62,21 +56,13 @@ public abstract class ValuePickerAdapter<T, V : View> :
         return ItemContainerViewHolder.create(
             parent = parent,
             orientation = orientation,
-            crossAxisSize = getMaxItemSize(parent.context),
+            crossAxisSize = if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
+                pickerView?.itemWidth
+            } else {
+                pickerView?.itemHeight
+            } ?: ValuePickerView.getDefaultItemSize(parent.resources.displayMetrics),
             itemView = createItemView(parent.context)
         )
-    }
-
-    /**
-     * Returns item's cross axis max size (Width when horizontal, height when vertical).
-     * Default is 48DP.
-     */
-    public open fun getMaxItemSize(context: Context): Int {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            48f,
-            context.resources.displayMetrics
-        ).roundToInt()
     }
 
     /**
