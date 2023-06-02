@@ -46,22 +46,6 @@ public class SampleListFragment : Fragment() {
                 "Basic Number Picker\n(Jetpack Compose)",
                 SampleListFragmentDirections.actionSampleListFragmentToBasicNumberPickerComposeSample()
             ),
-            SampleItem(
-                "Basic Date Picker",
-                null
-            ),
-            SampleItem(
-                "Basic Date Picker\n(Jetpack Compose)",
-                null
-            ),
-            SampleItem(
-                "Basic Time Picker",
-                null
-            ),
-            SampleItem(
-                "Basic Time Picker\n(Jetpack Compose)",
-                null
-            ),
         ))
         return samples
     }
