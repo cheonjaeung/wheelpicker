@@ -8,7 +8,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.repository == 'cheonjaewoong/snappicker'
+    if: github.repository == 'cheonjaewoong/wheelpicker'
 
     steps:
       - name: Checkout
