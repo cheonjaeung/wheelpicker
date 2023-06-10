@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.snappicker"
+    namespace = "com.example.wheelpicker"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.snappicker"
+        applicationId = "com.example.wheelpicker"
         minSdk = 21
         targetSdk = 33
         versionCode = 1
@@ -36,8 +36,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":snappicker"))
-    implementation(project(":snappicker-compose"))
+    implementation(project(":wheelpicker"))
+    implementation(project(":wheelpicker-compose"))
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

@@ -30,7 +30,7 @@
             tools:text="0" />
     </LinearLayout>
 
-    <io.woong.snappicker.ValuePickerView
+    <io.woong.wheelpicker.ValuePickerView
         android:id="@+id/picker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,5 +44,5 @@
             android:layout_margin="8dp"
             android:background="@drawable/background_basic_number_picker_decoration"
             android:layout_gravity="center_vertical" />
-    </io.woong.snappicker.ValuePickerView>
+    </io.woong.wheelpicker.ValuePickerView>
 </LinearLayout>

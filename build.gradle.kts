@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects {
-    group = "io.woong.snappicker"
+    group = "io.woong.wheelpicker"
     version = "1.0.0-SNAPSHOT"
 
     repositories {

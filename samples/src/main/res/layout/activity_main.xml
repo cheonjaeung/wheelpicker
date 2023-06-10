@@ -11,7 +11,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="SnapPicker Samples" />
+        app:title="WheelPicker Samples" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/navigation_host"

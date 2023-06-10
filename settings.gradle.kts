@@ -6,8 +6,8 @@ pluginManagement {
     }
 }
 
-rootProject.name = "snappicker"
+rootProject.name = "wheelpicker"
 
-include(":snappicker")
-include(":snappicker-compose")
+include(":wheelpicker")
+include(":wheelpicker-compose")
 include(":samples")
