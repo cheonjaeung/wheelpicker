@@ -22,10 +22,6 @@ public abstract class ValuePickerAdapter<T, V : View> :
      */
     public var values: List<T> = emptyList()
 
-    @RecyclerView.Orientation
-    private val orientation: Int
-        get() = pickerView?.orientation ?: ValuePickerView.DEFAULT_ORIENTATION
-
     private val isCyclic: Boolean
         get() = pickerView?.isCyclic ?: ValuePickerView.DEFAULT_CYCLIC_ENABLED
 
@@ -55,12 +51,8 @@ public abstract class ValuePickerAdapter<T, V : View> :
     ): ItemContainerViewHolder<V> {
         return ItemContainerViewHolder.create(
             parent = parent,
-            orientation = orientation,
-            crossAxisSize = if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-                pickerView?.itemWidth
-            } else {
-                pickerView?.itemHeight
-            } ?: ValuePickerView.getDefaultItemSize(parent.resources.displayMetrics),
+            itemHeight = pickerView?.itemHeight
+                ?: ValuePickerView.getDefaultItemSize(parent.resources.displayMetrics),
             itemView = createItemView(parent.context)
         )
     }

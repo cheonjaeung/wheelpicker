@@ -15,22 +15,14 @@ public class ItemContainerViewHolder<V : View> private constructor(
     public companion object {
         internal fun <V : View> create(
             parent: ViewGroup,
-            @RecyclerView.Orientation orientation: Int,
-            crossAxisSize: Int,
-            itemView: View
+            itemView: View,
+            itemHeight: Int,
         ): ItemContainerViewHolder<V> {
             val containerView = FrameLayout(parent.context)
-            val itemWidth = if (orientation == RecyclerView.VERTICAL) {
-                FrameLayout.LayoutParams.MATCH_PARENT
-            } else {
-                crossAxisSize
-            }
-            val itemHeight = if (orientation == RecyclerView.VERTICAL) {
-                crossAxisSize
-            } else {
-                FrameLayout.LayoutParams.MATCH_PARENT
-            }
-            containerView.layoutParams = FrameLayout.LayoutParams(itemWidth, itemHeight)
+            containerView.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                itemHeight
+            )
             itemView.id = ViewCompat.generateViewId()
             containerView.addView(itemView)
             return ItemContainerViewHolder(containerView, itemView.id)

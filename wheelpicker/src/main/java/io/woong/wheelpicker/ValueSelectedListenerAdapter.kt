@@ -44,8 +44,7 @@ internal class ValueSelectedListenerAdapter : RecyclerView.OnScrollListener() {
         val picker = this.pickerView
         val pickerAdapter = picker?.adapter
         if (picker != null && pickerAdapter != null) {
-            val orientation = picker.orientation
-            val centerPosition = findCenterVisibleItemPosition(recyclerView, orientation)
+            val centerPosition = findCenterVisibleItemPosition(recyclerView)
             if (centerPosition != RecyclerView.NO_POSITION) {
                 val actualValueCount = pickerAdapter.getValueCount()
                 val centerIndex = centerPosition % actualValueCount
@@ -57,7 +56,7 @@ internal class ValueSelectedListenerAdapter : RecyclerView.OnScrollListener() {
         }
     }
 
-    private fun findCenterVisibleItemPosition(recyclerView: RecyclerView, orientation: Int): Int {
+    private fun findCenterVisibleItemPosition(recyclerView: RecyclerView): Int {
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
         val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
         val firstVisibleItemView = layoutManager.findViewByPosition(firstVisiblePosition)
@@ -79,11 +78,9 @@ internal class ValueSelectedListenerAdapter : RecyclerView.OnScrollListener() {
             return RecyclerView.NO_POSITION
         }
 
-        val recyclerViewCenter = if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-            Point(recyclerViewGlobalBounds.centerX(), recyclerViewGlobalBounds.centerY())
-        } else {
-            Point(recyclerViewGlobalBounds.centerX(), recyclerViewGlobalBounds.centerY())
-        }
+        val x = recyclerViewGlobalBounds.centerX()
+        val y = recyclerViewGlobalBounds.centerY()
+        val recyclerViewCenter = Point(x, y)
         val isFirstCloserThanLast = firstItemViewGlobalBounds.contains(recyclerViewCenter)
 
         return if (isFirstCloserThanLast) firstVisiblePosition else lastVisiblePosition

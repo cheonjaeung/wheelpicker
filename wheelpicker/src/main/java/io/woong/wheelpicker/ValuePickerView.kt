@@ -14,22 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.roundToInt
 
 /**
- * A scrollable picker to allow user to select one value from multiple items.
- *
- * [ValuePickerView] displays multiple items as a linear list, vertical or horizontal, with
- * snap fling behavior. The picker scroll position will stop at specified item, not ambiguous
- * position.
- *
- * This picker works with several components:
- * - [ValuePickerView]: A view class to be placed into view hierarchy.
- * - [ValuePickerAdapter]: An adapter class to handle data set and item view associated with
- *   specified data.
- * - Listeners: Listener classes or interfaces to receive specified events from this picker.
- *
- * To display values into picker view, at least, places a view to layout and adds adapter
- * to the picker view. And set values to the adapter.
- *
- * @see ValuePickerAdapter
+ * A wheel picker view to allow user to select one value from multiple choices.
  */
 public class ValuePickerView : FrameLayout {
 
@@ -55,29 +40,6 @@ public class ValuePickerView : FrameLayout {
                 value.pickerView = this
             }
             recyclerView.adapter = value
-            field = value
-            requestLayout()
-        }
-
-    /**
-     * Orientation of this picker. Either [ORIENTATION_VERTICAL] or [ORIENTATION_HORIZONTAL].
-     */
-    @RecyclerView.Orientation
-    public var orientation: Int
-        get() = (recyclerView.layoutManager as LinearLayoutManager).orientation
-        set(value) {
-            if (value != ORIENTATION_HORIZONTAL && value != ORIENTATION_VERTICAL) {
-                throw IllegalArgumentException("Orientation value must be one of 0 or 1")
-            }
-            (recyclerView.layoutManager as LinearLayoutManager).orientation = value
-            requestLayout()
-        }
-
-    /**
-     * Picker item view's maximum width size in pixel unit.
-     */
-    public var itemWidth: Int = getDefaultItemSize(resources.displayMetrics)
-        set(value) {
             field = value
             requestLayout()
         }
@@ -117,11 +79,6 @@ public class ValuePickerView : FrameLayout {
         @StyleRes defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.ValuePickerView, defStyleAttr, defStyleRes)
-        val orientation = a.getInt(R.styleable.ValuePickerView_android_orientation, ORIENTATION_VERTICAL)
-        itemWidth = a.getDimensionPixelSize(
-            R.styleable.ValuePickerView_itemWidth,
-            getDefaultItemSize(resources.displayMetrics)
-        )
         itemHeight = a.getDimensionPixelSize(
             R.styleable.ValuePickerView_itemHeight,
             getDefaultItemSize(resources.displayMetrics)
@@ -133,7 +90,7 @@ public class ValuePickerView : FrameLayout {
         recyclerView = RecyclerView(context)
         recyclerViewId = ViewCompat.generateViewId()
         recyclerView.id = recyclerViewId
-        val pickerLayoutManager = LinearLayoutManager(context, orientation, false)
+        val pickerLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         recyclerView.layoutManager = pickerLayoutManager
 
         snapHelper = LinearSnapHelper()
@@ -179,14 +136,8 @@ public class ValuePickerView : FrameLayout {
         // areas can be transparent and scrollable.
         val adapter = this.adapter
         if (adapter != null) {
-            val innerPadding: Int
-            if (orientation == ORIENTATION_VERTICAL) {
-                innerPadding = (measuredHeight / 2) - (itemHeight / 2)
-                recyclerView.setPadding(0, innerPadding, 0, innerPadding)
-            } else {
-                innerPadding = (measuredWidth / 2) - (itemWidth / 2)
-                recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
-            }
+            val innerPadding = (measuredHeight / 2) - (itemHeight / 2)
+            recyclerView.setPadding(0, innerPadding, 0, innerPadding)
             if (recyclerView.clipToPadding) {
                 recyclerView.clipToPadding = false
             }
@@ -225,9 +176,6 @@ public class ValuePickerView : FrameLayout {
     }
 
     public companion object {
-        public const val ORIENTATION_HORIZONTAL: Int = RecyclerView.HORIZONTAL
-        public const val ORIENTATION_VERTICAL: Int = RecyclerView.VERTICAL
-
         /**
          * Scroll state constant means this picker is not currently scrolling.
          */
@@ -244,7 +192,6 @@ public class ValuePickerView : FrameLayout {
          */
         public const val SCROLL_STATE_SETTLING: Int = RecyclerView.SCROLL_STATE_SETTLING
 
-        public const val DEFAULT_ORIENTATION: Int = ORIENTATION_VERTICAL
         public const val DEFAULT_CYCLIC_ENABLED: Boolean = false
 
         internal fun getDefaultItemSize(displayMetrics: DisplayMetrics): Int {

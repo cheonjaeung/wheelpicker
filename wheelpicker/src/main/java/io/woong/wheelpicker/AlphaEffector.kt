@@ -58,24 +58,13 @@ internal class AlphaEffector : RecyclerView.OnScrollListener() {
      * applied alpha effect.
      */
     private fun computeActuallyVisibleItemCount(recyclerView: RecyclerView): Int {
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        val orientation = layoutManager.orientation
-
-        val singleItemViewSize: Float
-        val totalSize: Float
-        if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-            singleItemViewSize = recyclerView.computeHorizontalScrollExtent().toFloat()
-            totalSize = recyclerView.measuredWidth.toFloat()
-        } else {
-            singleItemViewSize = recyclerView.computeVerticalScrollExtent().toFloat()
-            totalSize = recyclerView.measuredHeight.toFloat()
-        }
+        val singleItemViewSize = recyclerView.computeVerticalScrollExtent().toFloat()
+        val totalSize = recyclerView.measuredHeight.toFloat()
         return ceil(totalSize / singleItemViewSize).toInt()
     }
 
     private fun findActuallyVisibleItemViews(recyclerView: RecyclerView, itemCount: Int): List<View>? {
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        val orientation = layoutManager.orientation
 
         val centerFirstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
         val centerFirstVisibleView = layoutManager.findViewByPosition(centerFirstVisiblePosition)
@@ -93,26 +82,14 @@ internal class AlphaEffector : RecyclerView.OnScrollListener() {
 
         val centerPosition: Int
         val centerView: View
-        if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-            val centerFirstViewRight = centerFirstVisibleViewBounds.right
-            val centerX = recyclerViewBounds.centerX()
-            if (centerX < centerFirstViewRight) {
-                centerPosition = centerFirstVisiblePosition
-                centerView = centerFirstVisibleView
-            } else {
-                centerPosition = centerLastVisiblePosition
-                centerView = centerLastVisibleView
-            }
+        val centerFirstViewBottom = centerFirstVisibleViewBounds.bottom
+        val centerY = recyclerViewBounds.centerY()
+        if (centerY < centerFirstViewBottom) {
+            centerPosition = centerFirstVisiblePosition
+            centerView = centerFirstVisibleView
         } else {
-            val centerFirstViewBottom = centerFirstVisibleViewBounds.bottom
-            val centerY = recyclerViewBounds.centerY()
-            if (centerY < centerFirstViewBottom) {
-                centerPosition = centerFirstVisiblePosition
-                centerView = centerFirstVisibleView
-            } else {
-                centerPosition = centerLastVisiblePosition
-                centerView = centerLastVisibleView
-            }
+            centerPosition = centerLastVisiblePosition
+            centerView = centerLastVisibleView
         }
 
         val halfItemCount = (itemCount - 1) / 2
@@ -132,13 +109,7 @@ internal class AlphaEffector : RecyclerView.OnScrollListener() {
     }
 
     private fun computeItemViewSize(recyclerView: RecyclerView): Float {
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        val orientation = layoutManager.orientation
-        return if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-            recyclerView.computeHorizontalScrollExtent().toFloat()
-        } else {
-            recyclerView.computeVerticalScrollExtent().toFloat()
-        }
+        return recyclerView.computeVerticalScrollExtent().toFloat()
     }
 
     private fun computeDistanceToCenter(view: View, recyclerView: RecyclerView): Float? {
@@ -148,17 +119,8 @@ internal class AlphaEffector : RecyclerView.OnScrollListener() {
             return null
         }
 
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        val orientation = layoutManager.orientation
-        val viewCenter: Float
-        val recyclerViewCenter: Float
-        if (orientation == ValuePickerView.ORIENTATION_HORIZONTAL) {
-            viewCenter = viewBounds.exactCenterX()
-            recyclerViewCenter = recyclerViewBounds.exactCenterX()
-        } else {
-            viewCenter = viewBounds.exactCenterY()
-            recyclerViewCenter = recyclerViewBounds.exactCenterY()
-        }
+        val viewCenter = viewBounds.exactCenterY()
+        val recyclerViewCenter = recyclerViewBounds.exactCenterY()
         return recyclerViewCenter - viewCenter
     }
 
