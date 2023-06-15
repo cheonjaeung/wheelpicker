@@ -11,6 +11,7 @@ import com.example.wheelpicker.R
 import com.example.wheelpicker.databinding.FragmentBasicNumberPickerSampleBinding
 import com.example.wheelpicker.databinding.ViewBasicNumberPickerItemBinding
 import io.woong.wheelpicker.ValuePickerAdapter
+import io.woong.wheelpicker.ValuePickerView
 
 public class BasicNumberPickerSample : Fragment() {
     override fun onCreateView(
@@ -21,6 +22,7 @@ public class BasicNumberPickerSample : Fragment() {
         val binding = FragmentBasicNumberPickerSampleBinding.inflate(inflater, container, false)
         val values = (0..23).toList()
         binding.selectedValue.text = values[0].toString()
+        binding.isScrollProgress.text = false.toString()
         val adapter = BasicNumberPickerAdapter()
         adapter.values = values
         binding.picker.adapter = adapter
@@ -28,6 +30,11 @@ public class BasicNumberPickerSample : Fragment() {
         binding.picker.setOnValueSelectedListener { _, position ->
             binding.selectedValue.text = values[position].toString()
         }
+        binding.picker.addOnScrollListener(object : ValuePickerView.OnScrollListener() {
+            override fun onScrollStateChanged(pickerView: ValuePickerView, newState: Int) {
+                binding.isScrollProgress.text = (newState != ValuePickerView.SCROLL_STATE_IDLE).toString()
+            }
+        })
         return binding.root
     }
 }
