@@ -46,7 +46,7 @@ internal class ValueSelectedListenerAdapter : RecyclerView.OnScrollListener() {
         if (picker != null && pickerAdapter != null) {
             val centerPosition = findCenterVisibleItemPosition(recyclerView)
             if (centerPosition != RecyclerView.NO_POSITION) {
-                val actualValueCount = pickerAdapter.getValueCount()
+                val actualValueCount = pickerAdapter.values.size
                 val centerIndex = centerPosition % actualValueCount
                 if (centerIndex != prevSelectedIndex) {
                     prevSelectedIndex = centerIndex

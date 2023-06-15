@@ -15,15 +15,15 @@ import androidx.recyclerview.widget.RecyclerView
 public abstract class ValuePickerAdapter<T, V : View> :
     RecyclerView.Adapter<ItemContainerViewHolder<V>>() {
 
+    /**
+     * Picker view reference to get some picker's options.
+     */
     internal var pickerView: ValuePickerView? = null
 
     /**
      * Value list to display into this picker.
      */
     public var values: List<T> = emptyList()
-
-    private val isCyclic: Boolean
-        get() = pickerView?.isCyclic ?: ValuePickerView.DEFAULT_CYCLIC_ENABLED
 
     /**
      * Returns a value at specified position. Note that it finds right value when this picker
@@ -35,13 +35,14 @@ public abstract class ValuePickerAdapter<T, V : View> :
      * Returns the total number of items in this adapter. Note that this count is affected by
      * cyclic option. If the picker is cyclic, it will returns [Int.MAX_VALUE].
      */
-    public final override fun getItemCount(): Int = if (isCyclic) Int.MAX_VALUE else values.size
-
-    /**
-     * Returns the total number of values in this picker. Note that this count is real values
-     * of the picker.
-     */
-    public fun getValueCount(): Int = values.size
+    public final override fun getItemCount(): Int {
+        val picker = this.pickerView ?: return 0
+        return if (picker.isCyclic) {
+            Int.MAX_VALUE
+        } else {
+            values.size
+        }
+    }
 
     public final override fun getItemViewType(position: Int): Int = super.getItemViewType(position)
 
@@ -49,10 +50,11 @@ public abstract class ValuePickerAdapter<T, V : View> :
         parent: ViewGroup,
         viewType: Int
     ): ItemContainerViewHolder<V> {
+        // onCreateViewHolder() will be called when adapter is attached to view.
+        val picker = this.pickerView ?: throw IllegalStateException("Impossible")
         return ItemContainerViewHolder.create(
             parent = parent,
-            itemHeight = pickerView?.itemHeight
-                ?: ValuePickerView.getDefaultItemSize(parent.resources.displayMetrics),
+            itemHeight = picker.itemHeight,
             itemView = createItemView(parent.context)
         )
     }

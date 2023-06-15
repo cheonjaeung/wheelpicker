@@ -60,7 +60,7 @@ internal class CyclicPickerRepositionHelper : RecyclerView.OnScrollListener() {
             return RecyclerView.NO_POSITION
         }
         val adapterItemCount = pickerAdapter.itemCount
-        val actualValueCount = pickerAdapter.getValueCount()
+        val actualValueCount = pickerAdapter.values.size
         val chunkCount = adapterItemCount / actualValueCount
         val currentValueIndex = currentPosition % actualValueCount
         val approximatelyCenterChunkFirstIndex = actualValueCount * (chunkCount / 2)
