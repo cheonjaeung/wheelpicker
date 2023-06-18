@@ -3,6 +3,8 @@ package io.woong.wheelpicker.compose
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import io.woong.wheelpicker.ValuePickerView
  * @param values The list of values to be displayed into this picker.
  * @param modifier The modifier instance to be applied to this picker's outer layout.
  * @param state The state to control this picker.
+ * @param contentPadding The padding around the picker.
  * @param itemHeight The size of item content.
  * @param isCyclic Whether this picker should displays values repeatedly.
  * @param itemContent The picker's items content composable.
@@ -27,6 +30,7 @@ public fun <T : Any> ValuePicker(
     values: List<T>,
     modifier: Modifier = Modifier,
     state: ValuePickerState<T> = rememberValuePickerState(initialValue = values[0]),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     itemHeight: Dp = 48.dp,
     isCyclic: Boolean = false,
     itemContent: @Composable BoxScope.(value: T) -> Unit
@@ -50,6 +54,9 @@ public fun <T : Any> ValuePicker(
 
         // TODO: Fix laggy cyclic picker repositioning.
         AndroidView(
+            modifier = Modifier
+                .padding(contentPadding)
+                .matchParentSize(),
             factory = { context ->
                 val androidValuePickerView = ValuePickerView(context)
                 val pickerAdapter = ComposeValuePickerAdapter(itemContent)
@@ -65,7 +72,6 @@ public fun <T : Any> ValuePicker(
                 androidValuePickerView.addOnScrollListener(scrollStateListener)
                 androidValuePickerView
             },
-            modifier = modifier,
         )
     }
 }
