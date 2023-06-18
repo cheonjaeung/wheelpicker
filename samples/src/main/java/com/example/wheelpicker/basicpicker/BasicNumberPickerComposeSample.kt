@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -100,16 +99,23 @@ private fun SampleContent() {
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.White),
             state = state,
-            isCyclic = true
+            isCyclic = true,
+            decorationBox = { innerPicker ->
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFE9E9E9))
+                )
+                innerPicker()
+            }
         ) { value ->
-            PickerItem(text = "$value")
+            Box(modifier = Modifier.fillMaxSize()) {
+                BasicText(text = value.toString(), modifier = Modifier.align(Alignment.Center))
+            }
         }
-    }
-}
-
-@Composable
-private fun PickerItem(text: String) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        BasicText(text = text, modifier = Modifier.align(Alignment.Center))
     }
 }

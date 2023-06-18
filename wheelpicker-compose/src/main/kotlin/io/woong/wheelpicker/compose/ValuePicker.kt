@@ -23,6 +23,9 @@ import io.woong.wheelpicker.ValuePickerView
  * @param contentPadding The padding around the picker.
  * @param itemHeight The size of item content.
  * @param isCyclic Whether this picker should displays values repeatedly.
+ * @param decorationBox The decoration composable around the picker, such as indicator.
+ * This composable lambda has one parameter called `innerPicker`. You must call `innerPicker`
+ * exactly once.
  * @param itemContent The picker's items content composable.
  */
 @Composable
@@ -33,6 +36,8 @@ public fun <T : Any> ValuePicker(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     itemHeight: Dp = 48.dp,
     isCyclic: Boolean = false,
+    decorationBox: @Composable BoxScope.(innerPicker: @Composable () -> Unit) -> Unit =
+        @Composable { innerPicker -> innerPicker() },
     itemContent: @Composable BoxScope.(value: T) -> Unit
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -52,26 +57,28 @@ public fun <T : Any> ValuePicker(
             }
         }
 
-        // TODO: Fix laggy cyclic picker repositioning.
-        AndroidView(
-            modifier = Modifier
-                .padding(contentPadding)
-                .matchParentSize(),
-            factory = { context ->
-                val androidValuePickerView = ValuePickerView(context)
-                val pickerAdapter = ComposeValuePickerAdapter(itemContent)
-                pickerAdapter.values = values
-                androidValuePickerView.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                androidValuePickerView.adapter = pickerAdapter
-                androidValuePickerView.itemHeight = itemHeightPx
-                androidValuePickerView.isCyclic = isCyclic
-                androidValuePickerView.setOnValueSelectedListener(valueSelectedListener)
-                androidValuePickerView.addOnScrollListener(scrollStateListener)
-                androidValuePickerView
-            },
-        )
+        decorationBox {
+            // TODO: Fix laggy cyclic picker repositioning.
+            AndroidView(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .matchParentSize(),
+                factory = { context ->
+                    val androidValuePickerView = ValuePickerView(context)
+                    val pickerAdapter = ComposeValuePickerAdapter(itemContent)
+                    pickerAdapter.values = values
+                    androidValuePickerView.layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    androidValuePickerView.adapter = pickerAdapter
+                    androidValuePickerView.itemHeight = itemHeightPx
+                    androidValuePickerView.isCyclic = isCyclic
+                    androidValuePickerView.setOnValueSelectedListener(valueSelectedListener)
+                    androidValuePickerView.addOnScrollListener(scrollStateListener)
+                    androidValuePickerView
+                },
+            )
+        }
     }
 }
