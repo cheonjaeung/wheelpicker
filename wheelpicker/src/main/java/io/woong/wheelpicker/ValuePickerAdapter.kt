@@ -1,6 +1,5 @@
 package io.woong.wheelpicker
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -55,14 +54,14 @@ public abstract class ValuePickerAdapter<T, V : View> :
         return ItemContainerViewHolder.create(
             parent = parent,
             itemHeight = picker.itemHeight,
-            itemView = createItemView(parent.context)
+            itemView = createItemView(parent)
         )
     }
 
     /**
      * Creates a new item view associated with specified position.
      */
-    public abstract fun createItemView(context: Context): V
+    public abstract fun createItemView(parent: ViewGroup): V
 
     public final override fun onBindViewHolder(
         holder: ItemContainerViewHolder<V>,

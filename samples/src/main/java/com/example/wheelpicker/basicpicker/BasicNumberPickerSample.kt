@@ -1,6 +1,5 @@
 package com.example.wheelpicker.basicpicker
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import com.example.wheelpicker.R
 import com.example.wheelpicker.databinding.FragmentBasicNumberPickerSampleBinding
-import com.example.wheelpicker.databinding.ViewBasicNumberPickerItemBinding
 import io.woong.wheelpicker.ValuePickerAdapter
 import io.woong.wheelpicker.ValuePickerView
 
@@ -40,9 +38,9 @@ public class BasicNumberPickerSample : Fragment() {
 }
 
 private class BasicNumberPickerAdapter : ValuePickerAdapter<Int, View>() {
-    override fun createItemView(context: Context): View {
-        val binding = ViewBasicNumberPickerItemBinding.inflate(LayoutInflater.from(context))
-        return binding.root
+    override fun createItemView(parent: ViewGroup): View {
+        val inflater = LayoutInflater.from(parent.context)
+        return inflater.inflate(R.layout.view_basic_number_picker_item, parent, false)
     }
 
     override fun bindItemView(itemView: View, position: Int) {

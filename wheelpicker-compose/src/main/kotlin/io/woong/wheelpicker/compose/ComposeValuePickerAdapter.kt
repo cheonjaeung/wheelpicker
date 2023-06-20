@@ -1,6 +1,5 @@
 package io.woong.wheelpicker.compose
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
@@ -18,8 +17,8 @@ import io.woong.wheelpicker.ValuePickerAdapter
 internal class ComposeValuePickerAdapter<T>(
     private val itemContent: @Composable (BoxScope.(value: T) -> Unit)
 ) : ValuePickerAdapter<T, View>() {
-    override fun createItemView(context: Context): View {
-        val composeItemView = ComposeView(context)
+    override fun createItemView(parent: ViewGroup): View {
+        val composeItemView = ComposeView(parent.context)
         composeItemView.apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
