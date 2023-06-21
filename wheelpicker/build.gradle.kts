@@ -37,7 +37,7 @@ mavenPublishing {
 
     pom {
         name.set("wheelpicker-compose")
-        description.set("High customizable Android picker library which displays values as scrollable list.")
+        description.set("Yet another Android wheel picker library.")
         url.set("https://github.com/cheonjaewoong/wheelpicker")
 
         licenses {

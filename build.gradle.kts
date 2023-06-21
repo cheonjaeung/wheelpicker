@@ -10,7 +10,7 @@ plugins {
 
 allprojects {
     group = "io.woong.wheelpicker"
-    version = "1.0.0-SNAPSHOT"
+    version = "0.1.0"
 
     repositories {
         google()
