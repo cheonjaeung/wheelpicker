@@ -3,7 +3,6 @@
 ![android-sdk](https://img.shields.io/badge/android-21+-brightgreen?logo=android)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 ![Maven Central](https://img.shields.io/maven-central/v/io.woong.wheelpicker/wheelpicker)
-![Maven Central](https://img.shields.io/maven-central/v/io.woong.wheelpicker/wheelpicker-compose)
 
 This is an Android library providing high customizable picker view.
 
