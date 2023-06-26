@@ -1,10 +1,21 @@
-# WheelPicker
+<h1 align="center">WheelPicker</h1>
 
-![android-sdk](https://img.shields.io/badge/android-21+-brightgreen?logo=android)
-![license](https://img.shields.io/badge/license-MIT-blue)
-![Maven Central](https://img.shields.io/maven-central/v/io.woong.wheelpicker/wheelpicker)
+<p align="center">
+    <img alt="android-sdk" src="https://img.shields.io/badge/android-21+-brightgreen?logo=android">
+    <img alt="license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue">
+    <img alt="maven-central" src="https://img.shields.io/maven-central/v/io.woong.wheelpicker/wheelpicker">
+</p>
+<p align="center">
+    <img src="./screenshots/example.png" width="400">
+</p>
+<p align="center">Customizable Android picker view library.</p>
 
-This is an Android library providing high customizable picker view.
+WheelPicker is an Android library that contains customizable wheel picker view, usable for Android XML
+View and Jetpack Compose. There are some picker views in Android like NumberPicker or material pickers.
+But if you need other style, that is boring.
+
+This picker is developed for customizing picker. You can style picker with custom item view, indicator
+and other decorations. And in the future, effect and animation customizing API will be added. (Currently planed)
 
 ## Installation
 
