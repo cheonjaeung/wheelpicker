@@ -86,4 +86,5 @@ ValuePicker(
 
 ## License
 
-This project is licensed under the MIT license. See [License file](./LICENSE.txt) for more details.
+This project is licensed under the Apache License Version 2.0.
+See [License file](./LICENSE.txt) for more details.
