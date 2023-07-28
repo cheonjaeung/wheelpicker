@@ -1,9 +1,9 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("com.vanniktech.maven.publish")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.maven.publish)
 }
 
 android {
@@ -26,8 +26,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    api("androidx.recyclerview:recyclerview:1.2.1")
+    implementation(libs.androidx.appcompat)
+    api(libs.androidx.recylerview)
 }
 
 mavenPublishing {

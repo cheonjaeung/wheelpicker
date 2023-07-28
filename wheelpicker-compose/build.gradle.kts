@@ -1,9 +1,9 @@
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("com.vanniktech.maven.publish")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.maven.publish)
 }
 
 android {
@@ -35,10 +35,9 @@ android {
 
 dependencies {
     api(project(":wheelpicker"))
-    implementation("androidx.compose.runtime:runtime:1.3.3")
-    implementation("androidx.compose.foundation:foundation:1.3.1")
-    implementation("androidx.compose.ui:ui:1.3.3")
-    implementation("dev.chrisbanes.snapper:snapper:0.3.0")
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.ui)
 }
 
 mavenPublishing {
