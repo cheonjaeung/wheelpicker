@@ -74,7 +74,6 @@ public fun <T : Any> ValuePicker(
         }
 
         decorationBox {
-            // TODO: Fix laggy cyclic picker repositioning.
             AndroidView(
                 modifier = Modifier
                     .padding(contentPadding)

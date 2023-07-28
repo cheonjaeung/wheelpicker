@@ -40,7 +40,9 @@ internal class ComposeValuePickerAdapter<T>(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+            )
         }
         return composeItemView
     }
