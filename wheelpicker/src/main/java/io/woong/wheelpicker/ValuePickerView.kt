@@ -121,16 +121,7 @@ public class ValuePickerView : FrameLayout {
         alphaEffector.attachToPickerView(this)
 
         addView(recyclerView)
-        postMoveToInitialPosition(initialIndex)
-    }
-
-    private fun postMoveToInitialPosition(initialIndex: Int) = post {
-        if (isCyclic) {
-            val pos = cyclicPickerRepositionHelper.findApproximatelyCenterPosition(initialIndex)
-            scrollToPosition(pos)
-        } else {
-            scrollToPosition(initialIndex)
-        }
+        scrollToIndex(initialIndex)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -163,11 +154,30 @@ public class ValuePickerView : FrameLayout {
     /**
      * Move this picker's scroll position to the given position without animation.
      *
-     * @param position The destination index.
+     * Note: the [position] is related to internal scroll position, not a selected index. To move
+     * to a specified selected index, use [scrollToIndex] instead.
+     *
+     * @param position A destination scroll position.
      */
     public fun scrollToPosition(position: Int) {
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
         layoutManager.scrollToPosition(position)
+    }
+
+    /**
+     * Move selected index to specified index without animation.
+     *
+     * @param index A destination selected index.
+     */
+    public fun scrollToIndex(index: Int) {
+        post {
+            if (isCyclic) {
+                val pos = cyclicPickerRepositionHelper.findApproximatelyCenterPosition(index)
+                scrollToPosition(pos)
+            } else {
+                scrollToPosition(index)
+            }
+        }
     }
 
     /**

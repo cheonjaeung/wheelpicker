@@ -28,18 +28,18 @@ import androidx.compose.runtime.setValue
  * A state object to handle [ValuePicker]. In most cases, it can be used with
  * [rememberValuePickerState].
  *
- * @param initialValue The initial value of the picker.
+ * @param initialIndex The initial selected value of the picker.
  * @param onValueSelect Optional callback that invoked when selected value changed.
  */
 @Stable
 public class ValuePickerState<T>(
-    initialValue: T,
-    internal val onValueSelect: (value: T) -> Unit = {},
+    internal val initialIndex: Int,
+    internal val onValueSelect: (value: T) -> Unit,
 ) {
     /**
-     * The current value of this picker.
+     * The current selected index of this picker.
      */
-    public var currentValue: T by mutableStateOf(initialValue)
+    public var currentIndex: Int by mutableStateOf(initialIndex)
         internal set
 
     /**
@@ -52,12 +52,38 @@ public class ValuePickerState<T>(
         /**
          * The default [Saver] implementation for [ValuePickerState].
          */
-        public fun <T : Any> Saver(onValueSelect: (value: T) -> Unit): Saver<ValuePickerState<T>, T> {
+        public fun <T : Any> Saver(onValueSelect: (value: T) -> Unit): Saver<ValuePickerState<T>, Int> {
             return Saver(
-                save = { it.currentValue },
-                restore = { ValuePickerState(it, onValueSelect) },
+                save = {
+                    it.currentIndex
+                },
+                restore = {
+                    ValuePickerState(it, onValueSelect)
+                },
             )
         }
+    }
+}
+
+/**
+ * Creates and remembers a [ValuePickerState] to handle [ValuePicker].
+ *
+ * @param initialIndex The initial selected index of the picker.
+ * @param onValueSelect Optional callback that invoked when selected value changed.
+ */
+@Stable
+@Composable
+public fun <T : Any> rememberValuePickerState(
+    initialIndex: Int = 0,
+    onValueSelect: (value: T) -> Unit = {},
+): ValuePickerState<T> {
+    return rememberSaveable(
+        saver = ValuePickerState.Saver(onValueSelect = onValueSelect)
+    ) {
+        ValuePickerState(
+            initialIndex = initialIndex,
+            onValueSelect = onValueSelect,
+        )
     }
 }
 
@@ -67,6 +93,7 @@ public class ValuePickerState<T>(
  * @param initialValue The initial value of the picker.
  * @param onValueSelect Optional callback that invoked when selected value changed.
  */
+@Deprecated("Use rememberValuePickerState with initialIndex instead.")
 @Stable
 @Composable
 public fun <T : Any> rememberValuePickerState(
@@ -77,7 +104,7 @@ public fun <T : Any> rememberValuePickerState(
         saver = ValuePickerState.Saver(onValueSelect = onValueSelect)
     ) {
         ValuePickerState(
-            initialValue = initialValue,
+            initialIndex = 0,
             onValueSelect = onValueSelect,
         )
     }
