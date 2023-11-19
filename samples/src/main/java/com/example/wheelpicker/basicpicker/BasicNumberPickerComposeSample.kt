@@ -53,7 +53,7 @@ private fun SampleContent() {
             .background(Color(0xfff9f9f9))
     ) {
         val values = remember { (0..23).toList() }
-        val state = rememberValuePickerState(initialValue = values[3])
+        val state = rememberValuePickerState<Int>(initialIndex = 3)
 
         Column(
             modifier = Modifier
@@ -73,7 +73,7 @@ private fun SampleContent() {
                     append("Selected Value: ")
                 }
                 withStyle(SpanStyle(fontSize = 18.sp, color = Color.Gray)) {
-                    append("${state.currentValue}")
+                    append("${values[state.currentIndex]}")
                 }
             })
             BasicText(text = buildAnnotatedString {
