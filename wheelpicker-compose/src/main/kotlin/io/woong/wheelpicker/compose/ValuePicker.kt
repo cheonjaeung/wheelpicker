@@ -48,7 +48,7 @@ import io.woong.wheelpicker.ValuePickerView
 public fun <T : Any> ValuePicker(
     values: List<T>,
     modifier: Modifier = Modifier,
-    state: ValuePickerState<T> = rememberValuePickerState(initialValue = values[0]),
+    state: ValuePickerState<T> = rememberValuePickerState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     itemHeight: Dp = 48.dp,
     isCyclic: Boolean = false,
@@ -61,7 +61,7 @@ public fun <T : Any> ValuePicker(
 
         val valueSelectedListener = remember {
             ValuePickerView.OnValueSelectedListener { _, index ->
-                state.currentValue = values[index]
+                state.currentIndex = index
             }
         }
 
