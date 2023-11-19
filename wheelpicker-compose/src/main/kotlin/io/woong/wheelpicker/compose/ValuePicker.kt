@@ -90,6 +90,7 @@ public fun <T : Any> ValuePicker(
                     androidValuePickerView.itemHeight = itemHeightPx
                     androidValuePickerView.isCyclic = isCyclic
                     androidValuePickerView.setOnValueSelectedListener(valueSelectedListener)
+                    androidValuePickerView.scrollToIndex(state.initialIndex)
                     androidValuePickerView.addOnScrollListener(scrollStateListener)
                     androidValuePickerView
                 },
