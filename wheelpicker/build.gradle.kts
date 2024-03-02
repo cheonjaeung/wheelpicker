@@ -38,7 +38,7 @@ mavenPublishing {
     pom {
         name.set("wheelpicker-compose")
         description.set("Yet another Android wheel picker library.")
-        url.set("https://github.com/cheonjaewoong/wheelpicker")
+        url.set("https://github.com/cheonjaeung/wheelpicker")
 
         licenses {
             license {
@@ -49,16 +49,16 @@ mavenPublishing {
 
         developers {
             developer {
-                id.set("cheonjaewoong")
-                name.set("Jaewoong Cheon")
+                id.set("cheonjaeung")
+                name.set("Jaeung Cheon")
                 email.set("cheonjaewoong@gmail.com")
             }
         }
 
         scm {
-            url.set("https://github.com/cheonjaewoong/wheelpicker")
-            connection.set("scm:git:git://github.com/cheonjaewoong/wheelpicker.git")
-            developerConnection.set("scm:git:ssh://git@github.com/cheonjaewoong/wheelpicker.git")
+            url.set("https://github.com/cheonjaeung/wheelpicker")
+            connection.set("scm:git:git://github.com/cheonjaeung/wheelpicker.git")
+            developerConnection.set("scm:git:ssh://git@github.com/cheonjaeung/wheelpicker.git")
         }
     }
 }
