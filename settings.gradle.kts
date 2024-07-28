@@ -6,8 +6,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "wheelpicker"
-
-include(":wheelpicker")
-include(":wheelpicker-compose")
-include(":samples")
+rootProject.name = "powerwheelpicker"
+include(":powerwheelpicker")

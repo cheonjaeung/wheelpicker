@@ -9,8 +9,8 @@ plugins {
 }
 
 allprojects {
-    group = "io.woong.wheelpicker"
-    version = "0.2.0"
+    group = "com.cheonjaeung.android.powerwheelpicker"
+    version = "0.3.0"
 
     repositories {
         google()
@@ -21,6 +21,5 @@ allprojects {
 subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
-        kotlinOptions.freeCompilerArgs += "-Xexplicit-api=strict"
     }
 }

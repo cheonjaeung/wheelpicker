@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <declare-styleable name="ValuePickerView">
-        <attr name="isCyclic" format="boolean" />
-        <attr name="initialIndex" format="integer" />
-        <attr name="itemHeight" format="dimension" />
-    </declare-styleable>
-</resources>
