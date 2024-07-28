@@ -97,5 +97,7 @@ ValuePicker(
 
 ## License
 
+Copyright 2023 Jaeung Cheon.
+
 This project is licensed under the Apache License Version 2.0.
 See [License file](./LICENSE.txt) for more details.
