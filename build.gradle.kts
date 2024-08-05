@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.cheonjaeung.android.powerwheelpicker"
+    group = "com.cheonjaeung.powerwheelpicker.android"
     version = "0.3.0"
 
     repositories {
