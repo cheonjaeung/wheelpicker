@@ -6,5 +6,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "powerwheelpicker"
+rootProject.name = "powerwheelpicker-android"
 include(":powerwheelpicker")
