@@ -8,3 +8,4 @@ pluginManagement {
 
 rootProject.name = "powerwheelpicker-android"
 include(":powerwheelpicker")
+include(":sample")

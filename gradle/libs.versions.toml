@@ -26,6 +26,7 @@ androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androi
 
 # Sample dependencies
 material-android = { module = "com.google.android.material:material", version.ref = "material-android" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-compose" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation" }
