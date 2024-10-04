@@ -23,6 +23,7 @@ androidx-recylerview = { module = "androidx.recyclerview:recyclerview", version.
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "androidx-compose" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "androidx-compose" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androidx-compose" }
+simplecarousel = { module = "com.cheonjaeung.simplecarousel.android:simplecarousel", version = "0.2.2" }
 
 # Sample dependencies
 material-android = { module = "com.google.android.material:material", version.ref = "material-android" }

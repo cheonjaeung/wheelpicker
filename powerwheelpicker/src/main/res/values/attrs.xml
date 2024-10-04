@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WheelPicker">
+        <attr name="android:orientation" />
+        <attr name="circular" format="boolean" />
+        <attr name="selector_width" format="dimension" />
+        <attr name="selector_height" format="dimension" />
+    </declare-styleable>
+</resources>
