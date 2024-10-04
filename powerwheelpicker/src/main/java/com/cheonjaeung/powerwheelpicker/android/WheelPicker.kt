@@ -32,7 +32,7 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * The underlying [RecyclerView].
      */
-    private val recyclerView: RecyclerView
+    internal val recyclerView: RecyclerView
 
     /**
      * The underlying layout manager for [recyclerView].
@@ -97,6 +97,10 @@ class WheelPicker @JvmOverloads constructor(
             field = value
         }
 
+    internal val onScrollListeners: MutableList<OnScrollListener> = mutableListOf()
+
+    private var scrollListenerAdapter: ScrollListenerAdapter? = null
+
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker)
         ViewCompat.saveAttributeDataForStyleable(
@@ -125,6 +129,8 @@ class WheelPicker @JvmOverloads constructor(
         recyclerView.clipToPadding = false
         val snapHelper = PickerSnapHelper()
         snapHelper.attachToRecyclerView(recyclerView)
+        scrollListenerAdapter = ScrollListenerAdapter()
+        scrollListenerAdapter?.attachToWheelPicker(this)
 
         attachViewToParent(recyclerView, 0, recyclerView.layoutParams)
     }
@@ -176,13 +182,82 @@ class WheelPicker @JvmOverloads constructor(
         recyclerView.layout(layoutRect.left, layoutRect.top, layoutRect.right, layoutRect.bottom)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        scrollListenerAdapter?.detachFromWheelPicker()
+        scrollListenerAdapter = null
+        onScrollListeners.clear()
+    }
+
+    /**
+     * Adds a listener to receive scrolling events.
+     */
+    fun addOnScrollListener(listener: OnScrollListener) {
+        onScrollListeners.add(listener)
+    }
+
+    /**
+     * Removes a listener that was added to the [WheelPicker].
+     */
+    fun removeOnScrollListener(listener: OnScrollListener) {
+        onScrollListeners.remove(listener)
+    }
+
+    /**
+     * Removes all listeners that were added to the [WheelPicker].
+     */
+    fun clearOnScrollListeners() {
+        onScrollListeners.clear()
+    }
+
     companion object {
         private const val TAG: String = "WheelPicker"
 
         const val HORIZONTAL: Int = RecyclerView.HORIZONTAL
         const val VERTICAL: Int = RecyclerView.VERTICAL
 
+        /**
+         * Scroll state means that the [WheelPicker] is not currently scrolling.
+         */
+        const val SCROLL_STATE_IDLE: Int = RecyclerView.SCROLL_STATE_IDLE
+
+        /**
+         * Scroll state means that the [WheelPicker] is currently dragging by outside control
+         * such as user interaction.
+         */
+        const val SCROLL_STATE_DRAGGING: Int = RecyclerView.SCROLL_STATE_DRAGGING
+
+        /**
+         * Scroll state means that the [WheelPicker] is currently animating to a final position
+         * after outside control such as user interaction.
+         */
+        const val SCROLL_STATE_SETTLING: Int = RecyclerView.SCROLL_STATE_SETTLING
+
         private const val DEFAULT_ORIENTATION: Int = VERTICAL
         private const val DEFAULT_CIRCULAR: Boolean = true
+    }
+
+    /**
+     * A listener can be added to [WheelPicker] to receive scrolling events.
+     */
+    open class OnScrollListener {
+        /**
+         * Callback that invoked when [WheelPicker]'s scroll state is changed.
+         *
+         * @param wheelPicker The [WheelPicker] view which scrolled.
+         * @param newState The new scroll state. One of [SCROLL_STATE_IDLE], [SCROLL_STATE_DRAGGING]
+         * and [SCROLL_STATE_SETTLING].
+         */
+        open fun onScrollStateChanged(wheelPicker: WheelPicker, newState: Int) {}
+
+        /**
+         * Callback that invoked when [WheelPicker] has been scrolled. This callback will be called
+         * after the scroll is finished.
+         *
+         * @param wheelPicker The [WheelPicker] view which scrolled.
+         * @param dx The amount of horizontal scroll.
+         * @param dy The amount of vertical scroll.
+         */
+        open fun onScrolled(wheelPicker: WheelPicker, dx: Int, dy: Int) {}
     }
 }
