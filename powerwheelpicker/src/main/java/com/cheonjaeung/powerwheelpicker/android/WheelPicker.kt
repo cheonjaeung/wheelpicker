@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.cheonjaeung.simplecarousel.android.CarouselSnapHelper
 
 /**
  * [WheelPicker] is a view that allow user to select one item from multiple choices.
@@ -127,7 +128,7 @@ class WheelPicker @JvmOverloads constructor(
             LayoutParams.MATCH_PARENT
         )
         recyclerView.clipToPadding = false
-        val snapHelper = PickerSnapHelper()
+        val snapHelper = CarouselSnapHelper()
         snapHelper.attachToRecyclerView(recyclerView)
         scrollListenerAdapter = ScrollListenerAdapter()
         scrollListenerAdapter?.attachToWheelPicker(this)
