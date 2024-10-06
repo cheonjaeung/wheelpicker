@@ -46,6 +46,16 @@ class WheelPicker @JvmOverloads constructor(
     private val layoutRect: Rect = Rect()
 
     /**
+     * Reusable bounds to center position when finding selected item.
+     */
+    private val recyclerViewRect: Rect = Rect()
+
+    /**
+     * Reusable bounds to check visible item position when finding selected item.
+     */
+    private val visibleItemRect: Rect = Rect()
+
+    /**
      * A [RecyclerView.Adapter] to provide picker items on demand.
      */
     var adapter: RecyclerView.Adapter<*>?
@@ -98,9 +108,17 @@ class WheelPicker @JvmOverloads constructor(
             field = value
         }
 
+    /**
+     * The adapter position of the currently selected item. [NO_POSITION] if there is no selected item.
+     */
+    val currentPosition: Int
+        get() = findCenterVisibleItemPosition()
+
     internal val onScrollListeners: MutableList<OnScrollListener> = mutableListOf()
+    internal val onItemSelectedListeners: MutableList<OnItemSelectedListener> = mutableListOf()
 
     private var scrollListenerAdapter: ScrollListenerAdapter? = null
+    private var itemSelectedListenerAdapter: ItemSelectedListenerAdapter? = null
 
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker)
@@ -132,6 +150,8 @@ class WheelPicker @JvmOverloads constructor(
         snapHelper.attachToRecyclerView(recyclerView)
         scrollListenerAdapter = ScrollListenerAdapter()
         scrollListenerAdapter?.attachToWheelPicker(this)
+        itemSelectedListenerAdapter = ItemSelectedListenerAdapter()
+        itemSelectedListenerAdapter?.attachToWheelPicker(this)
 
         attachViewToParent(recyclerView, 0, recyclerView.layoutParams)
     }
@@ -186,8 +206,11 @@ class WheelPicker @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         scrollListenerAdapter?.detachFromWheelPicker()
+        itemSelectedListenerAdapter?.detachFromWheelPicker()
         scrollListenerAdapter = null
+        itemSelectedListenerAdapter = null
         onScrollListeners.clear()
+        onItemSelectedListeners.clear()
     }
 
     /**
@@ -211,11 +234,63 @@ class WheelPicker @JvmOverloads constructor(
         onScrollListeners.clear()
     }
 
+    /**
+     * Adds a listener to receive item selected event.
+     */
+    fun addOnItemSelectedListener(listener: OnItemSelectedListener) {
+        onItemSelectedListeners.add(listener)
+    }
+
+    /**
+     * Removes a listener that was added to the [WheelPicker].
+     */
+    fun removeOnItemSelectedListener(listener: OnItemSelectedListener) {
+        onItemSelectedListeners.remove(listener)
+    }
+
+    /**
+     * Removes all listeners that were added to the [WheelPicker].
+     */
+    fun clearOnItemSelectedListeners() {
+        onItemSelectedListeners.clear()
+    }
+
+    /**
+     * Finds the adapter position of the item at the center.
+     */
+    @SuppressLint("WrongConstant")
+    internal fun findCenterVisibleItemPosition(): Int {
+        val firstPosition = layoutManager.findFirstVisibleItemPosition()
+        val lastPosition = layoutManager.findLastVisibleItemPosition()
+        if (firstPosition == NO_POSITION || lastPosition == NO_POSITION) {
+            return NO_POSITION
+        }
+
+        if (firstPosition == lastPosition) {
+            return firstPosition
+        }
+
+        recyclerView.getGlobalVisibleRect(recyclerViewRect)
+        val centerX = recyclerViewRect.centerX()
+        val centerY = recyclerViewRect.centerY()
+        for (i in firstPosition..lastPosition) {
+            val item = layoutManager.findViewByPosition(i) ?: continue
+            item.getGlobalVisibleRect(visibleItemRect)
+            if (visibleItemRect.contains(centerX, centerY)) {
+                return i
+            }
+        }
+
+        return NO_POSITION
+    }
+
     companion object {
         private const val TAG: String = "WheelPicker"
 
         const val HORIZONTAL: Int = RecyclerView.HORIZONTAL
         const val VERTICAL: Int = RecyclerView.VERTICAL
+
+        const val NO_POSITION: Int = RecyclerView.NO_POSITION
 
         /**
          * Scroll state means that the [WheelPicker] is not currently scrolling.
@@ -260,5 +335,18 @@ class WheelPicker @JvmOverloads constructor(
          * @param dy The amount of vertical scroll.
          */
         open fun onScrolled(wheelPicker: WheelPicker, dx: Int, dy: Int) {}
+    }
+
+    /**
+     * A listener can be added to [WheelPicker] to receive item selected event.
+     */
+    fun interface OnItemSelectedListener {
+        /**
+         * Callback that invoked when an item is positioned within the selector area.
+         *
+         * @param wheelPicker The [WheelPicker] view which scrolled.
+         * @param position The selected item index.
+         */
+        fun onItemSelected(wheelPicker: WheelPicker, position: Int)
     }
 }
