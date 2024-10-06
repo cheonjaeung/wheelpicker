@@ -1,6 +1,6 @@
 [versions]
-kotlin = "1.7.20"
-android-gradle-plugin = "7.4.0"
+kotlin = "1.9.0"
+android-gradle-plugin = "8.5.1"
 maven-publish-plugin = "0.25.3"
 androidx-appcompat = "1.6.1"
 androidx-recyclerview = "1.2.1"
@@ -23,9 +23,11 @@ androidx-recylerview = { module = "androidx.recyclerview:recyclerview", version.
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "androidx-compose" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "androidx-compose" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androidx-compose" }
+simplecarousel = { module = "com.cheonjaeung.simplecarousel.android:simplecarousel", version = "0.3.0" }
 
 # Sample dependencies
 material-android = { module = "com.google.android.material:material", version.ref = "material-android" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-compose" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation" }
