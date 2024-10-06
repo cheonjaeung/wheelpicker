@@ -17,6 +17,8 @@ But if you need other style, that is boring.
 This picker is developed for customizing picker. You can style picker with custom item view, indicator
 and other decorations. And in the future, effect and animation customizing API will be added. (Currently planed)
 
+**Note: This library is under the huge refactoring.**
+
 ## Installation
 
 Prerequisites:
