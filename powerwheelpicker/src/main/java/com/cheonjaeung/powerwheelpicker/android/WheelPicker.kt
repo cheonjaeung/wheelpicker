@@ -184,7 +184,7 @@ class WheelPicker @JvmOverloads constructor(
         @SuppressLint("WrongConstant")
         when (orientation) {
             HORIZONTAL -> {
-                val innerPadding = (measuredWidth / 2) - (selectorWidth / 2)
+                val innerPadding = (layoutRect.width() / 2) - (selectorWidth / 2)
                 recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
                 if (selectorWidth == 0) {
                     Log.w(TAG, "selectorWidth should be set bigger than 0")
@@ -192,7 +192,7 @@ class WheelPicker @JvmOverloads constructor(
             }
 
             VERTICAL -> {
-                val innerPadding = (measuredHeight / 2) - (selectorHeight / 2)
+                val innerPadding = (layoutRect.height() / 2) - (selectorHeight / 2)
                 recyclerView.setPadding(0, innerPadding, 0, innerPadding)
                 if (selectorHeight == 0) {
                     Log.w(TAG, "selectorHeight should be set bigger than 0")
