@@ -120,6 +120,12 @@ class WheelPicker @JvmOverloads constructor(
     private var scrollListenerAdapter: ScrollListenerAdapter? = null
     private var itemSelectedListenerAdapter: ItemSelectedListenerAdapter? = null
 
+    /**
+     * Returns the number of [RecyclerView.ItemDecoration] currently added to this [WheelPicker].
+     */
+    val itemDecorationCount: Int
+        get() = recyclerView.itemDecorationCount
+
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker)
         ViewCompat.saveAttributeDataForStyleable(
@@ -253,6 +259,59 @@ class WheelPicker @JvmOverloads constructor(
      */
     fun clearOnItemSelectedListeners() {
         onItemSelectedListeners.clear()
+    }
+
+    /**
+     * Returns a [RecyclerView.ItemDecoration] at the given position.
+     *
+     * @param index The position of a decoration.
+     * @return The decoration at the given position.
+     * @throws IndexOutOfBoundsException On invalid position.
+     */
+    fun getItemDecorationAt(index: Int) {
+        recyclerView.getItemDecorationAt(index)
+    }
+
+    /**
+     * Adds a [RecyclerView.ItemDecoration] to this [WheelPicker]. Item decorations can affect both
+     * measurement and drawing of individual item views.
+     */
+    fun addItemDecoration(decoration: RecyclerView.ItemDecoration) {
+        recyclerView.addItemDecoration(decoration)
+    }
+
+    /**
+     * Adds a [RecyclerView.ItemDecoration] to this [WheelPicker]. Item decorations can affect both
+     * measurement and drawing of individual item views.
+     *
+     * @param decoration The decoration to add.
+     * @param index The position where this decoration will be inserted. If the index is negative,
+     * the decoration will be added at the end.
+     */
+    fun addItemDecoration(decoration: RecyclerView.ItemDecoration, index: Int) {
+        recyclerView.addItemDecoration(decoration, index)
+    }
+
+    /**
+     * Removes a [RecyclerView.ItemDecoration] from this [WheelPicker].
+     */
+    fun removeItemDecoration(decoration: RecyclerView.ItemDecoration) {
+        recyclerView.removeItemDecoration(decoration)
+    }
+
+    /**
+     * Removes a [RecyclerView.ItemDecoration] at the given position.
+     */
+    fun removeItemDecorationAt(index: Int) {
+        recyclerView.removeItemDecorationAt(index)
+    }
+
+    /**
+     * Invalidates all [RecyclerView.ItemDecoration] in this [WheelPicker]. It triggers
+     * [requestLayout] call.
+     */
+    fun invalidateItemDecorations() {
+        recyclerView.invalidateItemDecorations()
     }
 
     /**
