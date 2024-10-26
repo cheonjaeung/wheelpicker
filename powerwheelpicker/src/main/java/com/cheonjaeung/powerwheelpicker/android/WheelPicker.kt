@@ -166,6 +166,7 @@ class WheelPicker @JvmOverloads constructor(
         itemEffectorAdapter?.attachToWheelPicker(this)
 
         attachViewToParent(recyclerView, 0, recyclerView.layoutParams)
+        recyclerView.scrollToPosition(0)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
