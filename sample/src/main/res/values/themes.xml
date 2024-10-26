@@ -1,9 +1,7 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Powerwheelpickerandroid" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources>
+    <style name="Base.Theme.PowerWheelPickerSample" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/blue</item>
     </style>
 
-    <style name="Theme.Powerwheelpickerandroid" parent="Base.Theme.Powerwheelpickerandroid" />
+    <style name="Theme.PowerWheelPickerSample" parent="Base.Theme.PowerWheelPickerSample" />
 </resources>
