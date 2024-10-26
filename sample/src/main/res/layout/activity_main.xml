@@ -7,37 +7,51 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/selected"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:text="Selected: 0"
-        android:gravity="center"
+    <com.cheonjaeung.powerwheelpicker.android.WheelPicker
+        android:id="@+id/wheelPicker1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:circular="false"
+        app:selector_height="72dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
-
-    <TextView
-        android:id="@+id/isScrolled"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:text="isScrolling: false"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/selected"
-        tools:ignore="HardcodedText" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/black"
-        app:layout_constraintTop_toBottomOf="@+id/isScrolled" />
+        app:layout_constraintEnd_toStartOf="@+id/wheelPicker2"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.cheonjaeung.powerwheelpicker.android.WheelPicker
-        android:id="@+id/wheelPicker"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:id="@+id/wheelPicker2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/isScrolled"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:circular="false"
+        app:selector_height="72dp"
+        app:layout_constraintStart_toEndOf="@+id/wheelPicker1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/wheelPicker3"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.cheonjaeung.powerwheelpicker.android.WheelPicker
+        android:id="@+id/wheelPicker3"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         app:circular="true"
-        app:selector_height="48dp" />
+        app:selector_height="72dp"
+        app:layout_constraintStart_toEndOf="@+id/wheelPicker2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/wheelPicker4"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.cheonjaeung.powerwheelpicker.android.WheelPicker
+        android:id="@+id/wheelPicker4"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:circular="true"
+        app:selector_height="72dp"
+        app:layout_constraintStart_toEndOf="@+id/wheelPicker3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,10 +5,12 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cheonjaeung.simplecarousel.android.CarouselSnapHelper
+import kotlin.math.roundToInt
 
 /**
  * [WheelPicker] is a view that allow user to select one item from multiple choices.
@@ -38,7 +40,7 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * The underlying layout manager for [recyclerView].
      */
-    private val layoutManager: PickerLayoutManager
+    internal val layoutManager: PickerLayoutManager
 
     /**
      * Reusable instance to layout internal views.
@@ -116,9 +118,11 @@ class WheelPicker @JvmOverloads constructor(
 
     internal val onScrollListeners: MutableList<OnScrollListener> = mutableListOf()
     internal val onItemSelectedListeners: MutableList<OnItemSelectedListener> = mutableListOf()
+    internal val itemEffectors: MutableList<ItemEffector> = mutableListOf()
 
     private var scrollListenerAdapter: ScrollListenerAdapter? = null
     private var itemSelectedListenerAdapter: ItemSelectedListenerAdapter? = null
+    private var itemEffectorAdapter: ItemEffectorAdapter? = null
 
     /**
      * Returns the number of [RecyclerView.ItemDecoration] currently added to this [WheelPicker].
@@ -158,6 +162,8 @@ class WheelPicker @JvmOverloads constructor(
         scrollListenerAdapter?.attachToWheelPicker(this)
         itemSelectedListenerAdapter = ItemSelectedListenerAdapter()
         itemSelectedListenerAdapter?.attachToWheelPicker(this)
+        itemEffectorAdapter = ItemEffectorAdapter()
+        itemEffectorAdapter?.attachToWheelPicker(this)
 
         attachViewToParent(recyclerView, 0, recyclerView.layoutParams)
     }
@@ -213,10 +219,13 @@ class WheelPicker @JvmOverloads constructor(
         super.onDetachedFromWindow()
         scrollListenerAdapter?.detachFromWheelPicker()
         itemSelectedListenerAdapter?.detachFromWheelPicker()
+        itemEffectorAdapter?.detachFromWheelPicker()
         scrollListenerAdapter = null
         itemSelectedListenerAdapter = null
+        itemEffectorAdapter = null
         onScrollListeners.clear()
         onItemSelectedListeners.clear()
+        itemEffectors.clear()
     }
 
     /**
@@ -259,6 +268,27 @@ class WheelPicker @JvmOverloads constructor(
      */
     fun clearOnItemSelectedListeners() {
         onItemSelectedListeners.clear()
+    }
+
+    /**
+     * Adds a [ItemEffector] to apply visual effect to the [WheelPicker]'s item views.
+     */
+    fun addItemEffector(effector: ItemEffector) {
+        itemEffectors.add(effector)
+    }
+
+    /**
+     * Removes a [ItemEffector] that was added to the [WheelPicker].
+     */
+    fun removeItemEffector(effector: ItemEffector) {
+        itemEffectors.remove(effector)
+    }
+
+    /**
+     * Removes all [ItemEffector] that were added to the [WheelPicker].
+     */
+    fun clearItemEffectors() {
+        itemEffectors.clear()
     }
 
     /**
@@ -343,6 +373,31 @@ class WheelPicker @JvmOverloads constructor(
         return NO_POSITION
     }
 
+    /**
+     * Calculates the center position of the given child view within the [WheelPicker] view.
+     */
+    @SuppressLint("WrongConstant")
+    internal fun calculateChildCenter(child: View): Int {
+        val params = child.layoutParams as RecyclerView.LayoutParams
+        when (orientation) {
+            HORIZONTAL -> {
+                val left = layoutManager.getDecoratedLeft(child) - params.leftMargin
+                val right = layoutManager.getDecoratedRight(child) + params.rightMargin
+                val width = right - left
+                return (left + width / 2f).roundToInt()
+            }
+
+            VERTICAL -> {
+                val top = layoutManager.getDecoratedTop(child) - params.topMargin
+                val bottom = layoutManager.getDecoratedBottom(child) + params.bottomMargin
+                val height = bottom - top
+                return (top + height / 2f).roundToInt()
+            }
+
+            else -> throw IllegalStateException("Invalid orientation: $orientation")
+        }
+    }
+
     companion object {
         private const val TAG: String = "WheelPicker"
 
@@ -407,5 +462,36 @@ class WheelPicker @JvmOverloads constructor(
          * @param position The selected item index.
          */
         fun onItemSelected(wheelPicker: WheelPicker, position: Int)
+    }
+
+    /**
+     * A class that allows item views of this [WheelPicker] can have special visual effects like
+     * transformation, alpha, rotating using animation properties.
+     */
+    open class ItemEffector {
+        /**
+         * Apply a visual effect to the item view of the [WheelPicker]. This callback will be called when
+         * scroll state is changed.
+         *
+         * @param view The item view to apply visual effect.
+         * @param newState The new scroll state. One of [SCROLL_STATE_IDLE], [SCROLL_STATE_DRAGGING] and
+         * [SCROLL_STATE_SETTLING].
+         * @param positionOffset The position difference from selected item. Negative for start, positive
+         * for end direction. 0 means the selected item.
+         * @param centerOffset The pixel offset how far it is from center of the [WheelPicker].
+         */
+        open fun applyEffectOnScrollStateChanged(view: View, newState: Int, positionOffset: Int, centerOffset: Int) {}
+
+        /**
+         * Apply a visual effect to the item view of the [WheelPicker]. This callback will be called after
+         * the scroll is consumed.
+         *
+         * @param view The item view to apply visual effect.
+         * @param delta The amount of scroll.
+         * @param positionOffset The position difference from selected item. Negative for start, positive
+         * for end direction. 0 means the selected item.
+         * @param centerOffset The pixel offset how far it is from center of the [WheelPicker].
+         */
+        open fun applyEffectOnScrolled(view: View, delta: Int, positionOffset: Int, centerOffset: Int) {}
     }
 }
