@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -169,6 +170,10 @@ private class SampleItemEffector(
         view.alpha = 1f - abs(centerOffset) / (wheelPickerHeight / 2f)
         val textView = view.findViewById<TextView>(R.id.text)
         textView?.setTextColor(currentColor)
+    }
+
+    override fun applyEffectOnItemSelected(view: View, position: Int) {
+        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
     }
 }
 

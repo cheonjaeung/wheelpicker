@@ -395,6 +395,55 @@ class WheelPicker @JvmOverloads constructor(
     }
 
     /**
+     * Find a view at the center.
+     */
+    @SuppressLint("WrongConstant")
+    internal fun findCenterVisibleView(): View? {
+        val centerOffset = when (orientation) {
+            HORIZONTAL -> {
+                val start = layoutManager.paddingLeft
+                val end = layoutManager.width - layoutManager.paddingRight
+                val width = end - start
+                start + width / 2f
+            }
+
+            VERTICAL -> {
+                val top = layoutManager.paddingTop
+                val bottom = layoutManager.height - layoutManager.paddingBottom
+                val height = bottom - top
+                top + height / 2f
+            }
+
+            else -> throw IllegalStateException("Invalid orientation: $orientation")
+        }
+
+        for (i in 0 until layoutManager.childCount) {
+            val child = layoutManager.getChildAt(i) ?: continue
+            val params = child.layoutParams as RecyclerView.LayoutParams
+            val childStart: Int
+            val childEnd: Int
+            when (orientation) {
+                HORIZONTAL -> {
+                    childStart = layoutManager.getDecoratedLeft(child) - params.leftMargin
+                    childEnd = layoutManager.getDecoratedRight(child) + params.rightMargin
+                }
+
+                VERTICAL -> {
+                    childStart = layoutManager.getDecoratedTop(child) - params.topMargin
+                    childEnd = layoutManager.getDecoratedBottom(child) + params.bottomMargin
+                }
+
+                else -> throw IllegalStateException("Invalid orientation: $orientation")
+            }
+            if (centerOffset >= childStart && centerOffset <= childEnd) {
+                return child
+            }
+        }
+
+        return null
+    }
+
+    /**
      * Calculates the center position of the given child view within the [WheelPicker] view.
      */
     @SuppressLint("WrongConstant")
@@ -514,5 +563,14 @@ class WheelPicker @JvmOverloads constructor(
          * @param centerOffset The pixel offset how far it is from center of the [WheelPicker].
          */
         open fun applyEffectOnScrolled(view: View, delta: Int, positionOffset: Int, centerOffset: Int) {}
+
+        /**
+         * Apply a visual effect to the item view of the [WheelPicker]. This callback will be called after
+         * an item is selected.
+         *
+         * @param view The item view to apply visual effect.
+         * @param position The selected item adapter position.
+         */
+        open fun applyEffectOnItemSelected(view: View, position: Int) {}
     }
 }

@@ -9,6 +9,7 @@ import kotlin.math.roundToInt
  */
 internal class ItemEffectorAdapter : RecyclerView.OnScrollListener() {
     private var wheelPicker: WheelPicker? = null
+    private var lastSelectedPosition: Int = WheelPicker.NO_POSITION
 
     fun attachToWheelPicker(wheelPicker: WheelPicker) {
         if (this.wheelPicker == wheelPicker) {
@@ -80,6 +81,13 @@ internal class ItemEffectorAdapter : RecyclerView.OnScrollListener() {
                 val offsetFromCenter = centerOffset - viewCenterOffset
                 for (effector in wheelPicker.itemEffectors) {
                     effector.applyEffectOnScrolled(view, delta, positionDiff, offsetFromCenter)
+                }
+            }
+            if (centerPosition != lastSelectedPosition) {
+                val centerChild = wheelPicker.findCenterVisibleView() ?: return
+                lastSelectedPosition = centerPosition
+                for (effector in wheelPicker.itemEffectors) {
+                    effector.applyEffectOnItemSelected(centerChild, centerPosition)
                 }
             }
         }
