@@ -128,7 +128,7 @@ private class SampleItemEffector(
     context: Context,
     private val wheelPicker: WheelPicker
 ) : WheelPicker.ItemEffector() {
-    private val greenColor = ContextCompat.getColor(context, R.color.blue)
+    private val blueColor = ContextCompat.getColor(context, R.color.blue)
     private val blackColor = ContextCompat.getColor(context, R.color.black)
     private var targetColor = blackColor
     private var currentColor = blackColor
@@ -146,7 +146,7 @@ private class SampleItemEffector(
     ) {
         val textView = view.findViewById<TextView>(R.id.text)
         targetColor = if (newState != WheelPicker.SCROLL_STATE_IDLE) {
-            greenColor
+            blueColor
         } else {
             blackColor
         }
