@@ -48,16 +48,6 @@ class WheelPicker @JvmOverloads constructor(
     private val layoutRect: Rect = Rect()
 
     /**
-     * Reusable bounds to center position when finding selected item.
-     */
-    private val recyclerViewRect: Rect = Rect()
-
-    /**
-     * Reusable bounds to check visible item position when finding selected item.
-     */
-    private val visibleItemRect: Rect = Rect()
-
-    /**
      * A [RecyclerView.Adapter] to provide picker items on demand.
      */
     var adapter: RecyclerView.Adapter<*>?
@@ -350,47 +340,10 @@ class WheelPicker @JvmOverloads constructor(
      */
     @SuppressLint("WrongConstant")
     internal fun findCenterVisibleItemPosition(): Int {
-        val centerOffset = when (orientation) {
-            HORIZONTAL -> {
-                val start = layoutManager.paddingLeft
-                val end = layoutManager.width - layoutManager.paddingRight
-                val width = end - start
-                start + width / 2f
-            }
-
-            VERTICAL -> {
-                val top = layoutManager.paddingTop
-                val bottom = layoutManager.height - layoutManager.paddingBottom
-                val height = bottom - top
-                top + height / 2f
-            }
-
-            else -> throw IllegalStateException("Invalid orientation: $orientation")
+        val center = findCenterVisibleView()
+        if (center != null) {
+            return layoutManager.getPosition(center)
         }
-
-        for (i in 0 until layoutManager.childCount) {
-            val child = layoutManager.getChildAt(i) ?: continue
-            val params = child.layoutParams as RecyclerView.LayoutParams
-            val childStart: Int
-            val childEnd: Int
-            when (orientation) {
-                HORIZONTAL -> {
-                    childStart = layoutManager.getDecoratedLeft(child) - params.leftMargin
-                    childEnd = layoutManager.getDecoratedRight(child) + params.rightMargin
-                }
-
-                VERTICAL -> {
-                    childStart = layoutManager.getDecoratedTop(child) - params.topMargin
-                    childEnd = layoutManager.getDecoratedBottom(child) + params.bottomMargin
-                }
-
-                else -> throw IllegalStateException("Invalid orientation: $orientation")
-            }
-            if (centerOffset >= childStart && centerOffset <= childEnd) {
-                return layoutManager.getPosition(child)
-            }
-        }
-
         return NO_POSITION
     }
 
