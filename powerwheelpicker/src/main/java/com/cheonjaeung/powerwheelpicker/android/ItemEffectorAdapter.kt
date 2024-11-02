@@ -1,6 +1,5 @@
 package com.cheonjaeung.powerwheelpicker.android
 
-import android.annotation.SuppressLint
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.roundToInt
 
@@ -35,7 +34,6 @@ internal class ItemEffectorAdapter : RecyclerView.OnScrollListener() {
         wheelPicker?.recyclerView?.removeOnScrollListener(this)
     }
 
-    @SuppressLint("WrongConstant")
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         wheelPicker?.let { wheelPicker ->
             val layoutManager = wheelPicker.layoutManager
@@ -60,7 +58,6 @@ internal class ItemEffectorAdapter : RecyclerView.OnScrollListener() {
         }
     }
 
-    @SuppressLint("WrongConstant")
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         wheelPicker?.let { wheelPicker ->
             val layoutManager = wheelPicker.layoutManager
@@ -96,7 +93,6 @@ internal class ItemEffectorAdapter : RecyclerView.OnScrollListener() {
     /**
      * Calculates center offset of the [wheelPicker]. Returns negative value if failed.
      */
-    @SuppressLint("WrongConstant")
     private fun calculateWheelPickerCenter(): Int {
         wheelPicker?.let { wheelPicker ->
             return when (wheelPicker.orientation) {

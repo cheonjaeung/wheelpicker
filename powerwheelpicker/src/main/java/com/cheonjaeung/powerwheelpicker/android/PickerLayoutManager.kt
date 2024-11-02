@@ -1,11 +1,10 @@
 package com.cheonjaeung.powerwheelpicker.android
 
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Orientation
 import com.cheonjaeung.simplecarousel.android.CarouselLayoutManager
 
 internal class PickerLayoutManager(
-    @Orientation orientation: Int,
+    @WheelPicker.Orientation orientation: Int,
     circular: Boolean
 ) : CarouselLayoutManager(orientation, circular) {
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {

@@ -1,6 +1,5 @@
 package com.cheonjaeung.powerwheelpicker.android
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.os.Build
@@ -12,7 +11,9 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
+import androidx.annotation.RestrictTo
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cheonjaeung.simplecarousel.android.CarouselSnapHelper
@@ -67,8 +68,9 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * Current orientation of this picker, Either [HORIZONTAL] or [VERTICAL].
      */
-    @RecyclerView.Orientation
+    @Orientation
     var orientation: Int
+        @Orientation
         get() = layoutManager.orientation
         set(value) {
             if (value != HORIZONTAL && value != VERTICAL) {
@@ -247,7 +249,6 @@ class WheelPicker @JvmOverloads constructor(
             bottom - top - paddingBottom
         )
 
-        @SuppressLint("WrongConstant")
         when (orientation) {
             HORIZONTAL -> {
                 val innerPadding = (layoutRect.width() / 2) - (selectorWidth / 2)
@@ -401,7 +402,6 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * Finds the adapter position of the item at the center.
      */
-    @SuppressLint("WrongConstant")
     internal fun findCenterVisibleItemPosition(): Int {
         val center = findCenterVisibleView()
         if (center != null) {
@@ -413,7 +413,6 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * Find a view at the center.
      */
-    @SuppressLint("WrongConstant")
     internal fun findCenterVisibleView(): View? {
         val centerOffset = when (orientation) {
             HORIZONTAL -> {
@@ -462,7 +461,6 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * Calculates the center position of the given child view within the [WheelPicker] view.
      */
-    @SuppressLint("WrongConstant")
     internal fun calculateChildCenter(child: View): Int {
         val params = child.layoutParams as RecyclerView.LayoutParams
         when (orientation) {
@@ -512,6 +510,16 @@ class WheelPicker @JvmOverloads constructor(
         private const val DEFAULT_ORIENTATION: Int = VERTICAL
         private const val DEFAULT_CIRCULAR: Boolean = true
     }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(HORIZONTAL, VERTICAL)
+    annotation class Orientation
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING)
+    annotation class ScrollState
 
     private class SavedState : BaseSavedState {
         var recyclerViewId: Int
@@ -573,7 +581,7 @@ class WheelPicker @JvmOverloads constructor(
          * @param newState The new scroll state. One of [SCROLL_STATE_IDLE], [SCROLL_STATE_DRAGGING]
          * and [SCROLL_STATE_SETTLING].
          */
-        open fun onScrollStateChanged(wheelPicker: WheelPicker, newState: Int) {}
+        open fun onScrollStateChanged(wheelPicker: WheelPicker, @ScrollState newState: Int) {}
 
         /**
          * Callback that invoked when [WheelPicker] has been scrolled. This callback will be called
@@ -615,7 +623,12 @@ class WheelPicker @JvmOverloads constructor(
          * for end direction. 0 means the selected item.
          * @param centerOffset The pixel offset how far it is from center of the [WheelPicker].
          */
-        open fun applyEffectOnScrollStateChanged(view: View, newState: Int, positionOffset: Int, centerOffset: Int) {}
+        open fun applyEffectOnScrollStateChanged(
+            view: View,
+            @ScrollState newState: Int,
+            positionOffset: Int,
+            centerOffset: Int
+        ) {}
 
         /**
          * Apply a visual effect to the item view of the [WheelPicker]. This callback will be called after
