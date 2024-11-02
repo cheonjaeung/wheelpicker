@@ -1,6 +1,7 @@
 # PowerWheelPicker for Android
 
-![maven-central]("https://img.shields.io/maven-central/v/com.cheonjaeung.powerwheelpicker.android/powerwheelpicker)
+[![ci](https://github.com/cheonjaeung/powerwheelpicker-android/actions/workflows/ci.yml/badge.svg)](https://github.com/cheonjaeung/powerwheelpicker-android/actions/workflows/ci.yml)
+[![maven-central](https://img.shields.io/maven-central/v/com.cheonjaeung.powerwheelpicker.android/powerwheelpicker)](https://central.sonatype.com/artifact/com.cheonjaeung.powerwheelpicker.android/powerwheelpicker)
 [![Static Badge](https://img.shields.io/badge/License-Apache%202.0-Green)](./LICENSE.txt)
 
 PowerWheelPicker is a highly customizable wheel picker view for Android, backed by RecyclerView and [SimpleCarousel](https://github.com/cheonjaeung/simplecarousel-android).
