@@ -5,6 +5,8 @@
 
 PowerWheelPicker is a highly customizable wheel picker view for Android, backed by RecyclerView and [SimpleCarousel](https://github.com/cheonjaeung/simplecarousel-android).
 
+![sample-gif](./docs/gifs/VideoEditor_20241102_051809_1.gif)
+
 ## Installation
 
 To download this library, add dependency to your project.
