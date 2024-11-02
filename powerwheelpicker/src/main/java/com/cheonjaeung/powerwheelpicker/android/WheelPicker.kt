@@ -63,6 +63,12 @@ class WheelPicker @JvmOverloads constructor(
         get() = recyclerView.adapter
         set(value) {
             recyclerView.adapter = value
+            if (pendingCurrentPosition != NO_POSITION) {
+                recyclerView.scrollToPosition(pendingCurrentPosition)
+                pendingCurrentPosition = NO_POSITION
+            } else {
+                recyclerView.scrollToPosition(0)
+            }
         }
 
     /**
@@ -113,8 +119,11 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * The adapter position of the currently selected item. [NO_POSITION] if there is no selected item.
      */
-    val currentPosition: Int
+    var currentPosition: Int
         get() = findCenterVisibleItemPosition()
+        set(value) {
+            setCurrentPosition(value, false)
+        }
 
     internal val onScrollListeners: MutableList<OnScrollListener> = mutableListOf()
     internal val onItemSelectedListeners: MutableList<OnItemSelectedListener> = mutableListOf()
@@ -281,6 +290,32 @@ class WheelPicker @JvmOverloads constructor(
         onScrollListeners.clear()
         onItemSelectedListeners.clear()
         itemEffectors.clear()
+    }
+
+    /**
+     * Moves current position to an adapter position.
+     *
+     * @param position The position to select.
+     * @param smoothScroll if `true`, enable scrolling animation, move immediately otherwise.
+     */
+    fun setCurrentPosition(position: Int, smoothScroll: Boolean) {
+        val adapter = this.adapter
+        if (adapter == null) {
+            pendingCurrentPosition = position
+            return
+        }
+        if (adapter.itemCount == 0) {
+            return
+        }
+        if (position == currentPosition) {
+            return
+        }
+
+        if (smoothScroll) {
+            recyclerView.smoothScrollToPosition(position)
+        } else {
+            recyclerView.scrollToPosition(position)
+        }
     }
 
     /**
