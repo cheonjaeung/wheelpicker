@@ -158,8 +158,8 @@ class WheelPicker @JvmOverloads constructor(
 
         val orientation = a.getInt(R.styleable.WheelPicker_android_orientation, DEFAULT_ORIENTATION)
         val circular = a.getBoolean(R.styleable.WheelPicker_circular, DEFAULT_CIRCULAR)
-        selectorWidth = a.getDimensionPixelSize(R.styleable.WheelPicker_selector_width, 0)
-        selectorHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_selector_height, 0)
+        selectorWidth = a.getDimensionPixelSize(R.styleable.WheelPicker_selectorWidth, 0)
+        selectorHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
         a.recycle()
 
         recyclerView = RecyclerView(context)
