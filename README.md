@@ -1,105 +1,108 @@
-<h1 align="center">WheelPicker</h1>
+# PowerWheelPicker for Android
 
-<p align="center">
-    <img alt="android-sdk" src="https://img.shields.io/badge/android-21+-brightgreen?logo=android">
-    <img alt="license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue">
-    <img alt="maven-central" src="https://img.shields.io/maven-central/v/io.woong.wheelpicker/wheelpicker">
-</p>
-<p align="center">
-    <img src="./screenshots/example.png" width="400">
-</p>
-<p align="center">Customizable Android picker view library.</p>
+![maven-central]("https://img.shields.io/maven-central/v/com.cheonjaeung.powerwheelpicker.android/powerwheelpicker)
+[![Static Badge](https://img.shields.io/badge/License-Apache%202.0-Green)](./LICENSE.txt)
 
-WheelPicker is an Android library that contains customizable wheel picker view, usable for Android XML
-View and Jetpack Compose. There are some picker views in Android like NumberPicker or material pickers.
-But if you need other style, that is boring.
-
-This picker is developed for customizing picker. You can style picker with custom item view, indicator
-and other decorations. And in the future, effect and animation customizing API will be added. (Currently planed)
-
-**Note: This library is under the huge refactoring.**
+PowerWheelPicker is a highly customizable wheel picker view for Android, backed by RecyclerView and [SimpleCarousel](https://github.com/cheonjaeung/simplecarousel-android).
 
 ## Installation
 
-Prerequisites:
-- Android SDK 21 or higher.
-- JDK version 8 or higher.
+To download this library, add dependency to your project.
 
-This library is published to Maven Central. You can just install it like following:
-
-```groovy
-repositories {
-    mavenCentral()
-}
-
+```kotlin
 dependencies {
-    implementation("io.woong.wheelpicker:wheelpicker:${version}")
-    implementation("io.woong.wheelpicker:wheelpicker-compose:${version}")
+    implementation("com.cheonjaeung.powerwheelpicker.android:powerwheelpicker:<version>")
 }
 ```
 
 ## Getting Started
 
-### Android View
+### Setup
 
-Pickers of this library are working with 2 components. The view itself and the adapter.
-To draw picker in your layout, place `ValuePickerView` into layout.
+Add `WheelPicker` view to your layout.
 
 ```xml
-<io.woong.wheelpicker.ValuePickerView
-    android:id="@+id/picker"
+<com.cheonjaeung.powerwheelpicker.android.WheelPicker
+    android:id="@+id/wheelPicker"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:orientation="vertical" />
 ```
 
-After that, you should create an adapter for this picker view. The adapter must inheritances
-`ValuePickerAdapter`. The below example code is using view binding.
+All supported attributes:
+
+| Attribute           | Type                       | Description                            |
+|---------------------|----------------------------|----------------------------------------|
+| android:orientation | enum(horizontal, vertical) | Sets orientation of the `WheelPicker`. |
+| app:circular        | boolean                    | If `true`, enable circular mode.       |
+| app:selectorWidth   | dimension                  | Size of the selector area.             |
+| app:selectorHeight  | dimension                  | Size of the selector area.             |
+
+`WheelPicker` needs `RecyclerView.Adapter` to handle data set. Create and add an adapter to `WheelPicker`.
 
 ```kotlin
-class ExamplePickerAdapter : ValuePickerAdapter<Int, View>() {
-    override fun createItemView(parent: ViewGroup): View {
-        val inflater = LayoutInflater.from(parent.context)
-        return inflater.inflate(R.layout.example_item_view, parent, false)
-    }
+val wheelPicker = findViewById<WheelPicker>(R.id.wheelPicker)
+wheelPicker.adapter = SampleAdapter()
 
-    override fun bindItemView(itemView: View, position: Int) {
-        val value = getValue(position)
-        itemView.findViewById<AppCompatTextView>(R.id.valueText).text = value.toString()
-    }
+class SampleAdapter : RecyclerView.Adapter<SampleAdapter.Holder>() {
+    // ...
 }
 ```
 
-After implementing `ValuePickerAdapter`, you should set adapter to picker view.
+### Event Listening
+
+`WheelPicker` supports listeners for scrolling and item selected event.
+
+There are 2 listeners, `WheelPicker.OnScrollListener` and `WheelPicker.OnItemSelectedListener`.
+Both listeners can be added and removed via `add` or `remove` prefixed methods.
+
+`OnScrollListener` is a listener to receive scrolling event.
+It is same to `RecyclerView.OnScrollListener`.
 
 ```kotlin
-val picker = findViewById<ValuePickerView>(R.id.picker)
-val adapter = ExamplePickerAdapter()
-adapter.values = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-picker.adapter = adapter
+wheelPicker.addOnScrollListener(object : WheelPicker.OnScrollListener() {
+    override fun onScrollStateChanged(wheelPicker: WheelPicker, @ScrollState newState: Int) {
+        // Action for scroll state changing.
+    }
+
+    override fun onScrolled(wheelPicker: WheelPicker, dx: Int, dy: Int) {
+        // Action for scrolling.
+    }
+})
 ```
 
-### Jetpack Compose
-
-This library provides Jetpack Compose version of picker. To use picker in Jetpack Compose, place
-`ValuePicker` composable into layout.
+`OnItemSelectedListener` is a listener to receive item selected event.
 
 ```kotlin
-ValuePicker(
-    values = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-    modifier = Modifier.fillMaxSize().height(120.dp)
-) { value ->
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        BasicText(text = "$value")
-    }
+wheelPicker.addOnItemSelectedListener { _, position ->
+    Snackbar.make(findViewById(R.id.main), "Selected position: $position", 1000).show()
 }
 ```
+
+### Visual Effects
+
+`WheelPicker` has `WheelPicker.ItemEffector` to support visual effects like transformation, alpha and others.
+
+`ItemEffector` has 3 callbacks, `applyEffectOnScrollStateChanged`, `applyEffectOnScrolled` and `applyEffectOnItemSelected`.
+It makes more flexible to apply visual effect.
+
+```kotlin
+wheelPicker.addItemEffector(object : WheelPicker.ItemEffector() {
+    // Implementation of custom effector.
+})
+```
+
+### Sample
+
+This project has sample application in the [sample](./sample) directory.
+The sample app provides example of basic usage and visual effects.
+
+## Changelog
+
+Please see [changelog](./CHANGELOG.md) file.
 
 ## License
 
-Copyright 2023 Jaeung Cheon.
+Copyright 2023 Cheon Jaeung.
 
-This project is licensed under the Apache License Version 2.0.
-See [License file](./LICENSE.txt) for more details.
+This project is licensed under the Apache License Version 2.0. See [License file](./LICENSE.txt) for more details.
