@@ -3,13 +3,21 @@ package com.cheonjaeung.powerwheelpicker.android
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
+import android.os.Build
+import android.os.Parcel
+import android.os.Parcelable
+import android.os.Parcelable.ClassLoaderCreator
 import android.util.AttributeSet
 import android.util.Log
+import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cheonjaeung.simplecarousel.android.CarouselSnapHelper
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -115,6 +123,11 @@ class WheelPicker @JvmOverloads constructor(
     private var itemEffectorAdapter: ItemEffectorAdapter? = null
 
     /**
+     * A temporal value for restoring [currentPosition].
+     */
+    private var pendingCurrentPosition: Int = NO_POSITION
+
+    /**
      * Returns the number of [RecyclerView.ItemDecoration] currently added to this [WheelPicker].
      */
     val itemDecorationCount: Int
@@ -139,6 +152,7 @@ class WheelPicker @JvmOverloads constructor(
         a.recycle()
 
         recyclerView = RecyclerView(context)
+        recyclerView.id = View.generateViewId()
         layoutManager = PickerLayoutManager(orientation, circular)
         recyclerView.layoutManager = layoutManager
         recyclerView.layoutParams = LayoutParams(
@@ -157,6 +171,55 @@ class WheelPicker @JvmOverloads constructor(
 
         attachViewToParent(recyclerView, 0, recyclerView.layoutParams)
         recyclerView.scrollToPosition(0)
+    }
+
+    override fun onSaveInstanceState(): Parcelable? {
+        val viewState = super.onSaveInstanceState() ?: return null
+        val savedState = SavedState(viewState)
+        savedState.recyclerViewId = recyclerView.id
+        savedState.currentPosition = if (pendingCurrentPosition != NO_POSITION) {
+            currentPosition
+        } else {
+            pendingCurrentPosition
+        }
+        return savedState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state == null || state !is SavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+        super.onRestoreInstanceState(state.superState)
+        pendingCurrentPosition = state.currentPosition
+    }
+
+    override fun dispatchRestoreInstanceState(container: SparseArray<Parcelable>?) {
+        val savedState = container?.get(id)
+        if (container == null || savedState !is SavedState) {
+            super.dispatchRestoreInstanceState(container)
+            return
+        }
+        val previousRecyclerViewId = savedState.recyclerViewId
+        val currentRecyclerViewId = recyclerView.id
+        val parcelable = container.get(previousRecyclerViewId)
+        container.put(currentRecyclerViewId, parcelable)
+        container.remove(previousRecyclerViewId)
+        super.dispatchRestoreInstanceState(container)
+        restorePendingState()
+    }
+
+    /**
+     * Restores [WheelPicker]'s state with pending values.
+     */
+    private fun restorePendingState() {
+        if (pendingCurrentPosition == NO_POSITION) {
+            return
+        }
+        val adapter = this.adapter ?: return
+        val position = max(0, min(pendingCurrentPosition, adapter.itemCount - 1))
+        pendingCurrentPosition = NO_POSITION
+        recyclerView.scrollToPosition(position)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -448,6 +511,55 @@ class WheelPicker @JvmOverloads constructor(
 
         private const val DEFAULT_ORIENTATION: Int = VERTICAL
         private const val DEFAULT_CIRCULAR: Boolean = true
+    }
+
+    private class SavedState : BaseSavedState {
+        var recyclerViewId: Int
+        var currentPosition: Int
+
+        constructor(parcel: Parcel) : super(parcel) {
+            recyclerViewId = parcel.readInt()
+            currentPosition = parcel.readInt()
+        }
+
+        constructor(viewState: Parcelable) : super(viewState) {
+            recyclerViewId = 0
+            currentPosition = NO_POSITION
+        }
+
+        @RequiresApi(24)
+        constructor(parcel: Parcel, classLoader: ClassLoader) : super(parcel, classLoader) {
+            recyclerViewId = parcel.readInt()
+            currentPosition = parcel.readInt()
+        }
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            super.writeToParcel(parcel, flags)
+            parcel.writeInt(recyclerViewId)
+            parcel.writeInt(currentPosition)
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : ClassLoaderCreator<SavedState> {
+            override fun createFromParcel(parcel: Parcel, classLoader: ClassLoader): SavedState {
+                return if (Build.VERSION.SDK_INT >= 24) {
+                    SavedState(parcel, classLoader)
+                } else {
+                    SavedState(parcel)
+                }
+            }
+
+            override fun createFromParcel(parcel: Parcel): SavedState {
+                return SavedState(parcel)
+            }
+
+            override fun newArray(size: Int): Array<SavedState?> {
+                return arrayOfNulls(size)
+            }
+        }
     }
 
     /**
