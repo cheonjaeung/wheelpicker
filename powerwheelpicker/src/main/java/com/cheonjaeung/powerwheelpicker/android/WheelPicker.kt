@@ -103,6 +103,7 @@ class WheelPicker @JvmOverloads constructor(
                 throw IllegalArgumentException("selectorWidth must be a positive value")
             }
             field = value
+            requestLayout()
         }
 
     /**
@@ -114,6 +115,7 @@ class WheelPicker @JvmOverloads constructor(
                 throw IllegalArgumentException("selectorHeight must be a positive value")
             }
             field = value
+            requestLayout()
         }
 
     /**
