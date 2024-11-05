@@ -321,6 +321,27 @@ class WheelPicker @JvmOverloads constructor(
     }
 
     /**
+     * Sets pixel width and height of the selector area in the picker. The size must be a positive.
+     *
+     * @param size A pixel size of the selector width and height.
+     */
+    fun setSelectorSize(size: Int) {
+        selectorWidth = size
+        selectorHeight = size
+    }
+
+    /**
+     * Sets pixel width and height of the selector area in the picker. The size must be a positive.
+     *
+     * @param width A pixel size of the selector width.
+     * @param height A pixel size of the selector height.
+     */
+    fun setSelectorSize(width: Int, height: Int) {
+        selectorWidth = width
+        selectorHeight = height
+    }
+
+    /**
      * Adds a listener to receive scrolling events.
      */
     fun addOnScrollListener(listener: OnScrollListener) {
