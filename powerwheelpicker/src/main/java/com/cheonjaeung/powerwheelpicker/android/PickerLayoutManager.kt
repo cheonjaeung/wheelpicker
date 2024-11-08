@@ -34,4 +34,37 @@ internal class PickerLayoutManager(
             )
         }
     }
+
+    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
+        if (isItemSizeInvalid()) {
+            return
+        }
+        super.onLayoutChildren(recycler, state)
+    }
+
+    override fun scrollHorizontallyBy(
+        dx: Int,
+        recycler: RecyclerView.Recycler?,
+        state: RecyclerView.State?
+    ): Int {
+        if (isItemSizeInvalid()) {
+            return 0
+        }
+        return super.scrollHorizontallyBy(dx, recycler, state)
+    }
+
+    override fun scrollVerticallyBy(
+        dy: Int,
+        recycler: RecyclerView.Recycler?,
+        state: RecyclerView.State?
+    ): Int {
+        if (isItemSizeInvalid()) {
+            return 0
+        }
+        return super.scrollVerticallyBy(dy, recycler, state)
+    }
+
+    private fun isItemSizeInvalid(): Boolean {
+        return (orientation == HORIZONTAL && itemWidth == 0) || (orientation == VERTICAL && itemHeight == 0)
+    }
 }
