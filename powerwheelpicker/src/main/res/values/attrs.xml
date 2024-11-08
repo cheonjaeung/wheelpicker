@@ -3,7 +3,11 @@
     <declare-styleable name="WheelPicker">
         <attr name="android:orientation" />
         <attr name="circular" format="boolean" />
+        <attr name="itemWidth" format="dimension" />
+        <attr name="itemHeight" format="dimension" />
+        <!-- Deprecated. Use itemWidth instead. -->
         <attr name="selectorWidth" format="dimension" />
+        <!-- Deprecated. Use itemWidth instead. -->
         <attr name="selectorHeight" format="dimension" />
     </declare-styleable>
 </resources>

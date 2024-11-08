@@ -95,27 +95,49 @@ class WheelPicker @JvmOverloads constructor(
         }
 
     /**
-     * A pixel width of the selector area in the picker. The size must be a positive.
+     * A pixel width of the picker item. The size must not be a negative.
+     * It will be ignored when orientation is vertical.
      */
-    var selectorWidth: Int = 0
+    var itemWidth: Int
+        get() = layoutManager.itemWidth
         set(value) {
             if (value < 0) {
-                throw IllegalArgumentException("selectorWidth must be a positive value")
+                throw IllegalArgumentException("itemWidth must not be a negative: itemWidth=$value")
             }
-            field = value
-            requestLayout()
+            layoutManager.itemWidth = value
+        }
+
+    /**
+     * A pixel height of the picker item. The size must not be a negative.
+     * It will be ignored when orientation is horizontal.
+     */
+    var itemHeight: Int
+        get() = layoutManager.itemHeight
+        set(value) {
+            if (value < 0) {
+                throw IllegalArgumentException("itemHeight must not be a negative: itemHeight=$value")
+            }
+            layoutManager.itemHeight = value
+        }
+
+    /**
+     * A pixel width of the selector area in the picker. The size must be a positive.
+     */
+    @Deprecated("Use itemWidth instead", ReplaceWith("itemWidth"))
+    var selectorWidth: Int
+        get() = itemWidth
+        set(value) {
+            itemWidth = value
         }
 
     /**
      * A pixel height of the selector area in the picker. The size must be a positive.
      */
-    var selectorHeight: Int = 0
+    @Deprecated("Use itemHeight instead", ReplaceWith("itemHeight"))
+    var selectorHeight: Int
+        get() = itemHeight
         set(value) {
-            if (value < 0) {
-                throw IllegalArgumentException("selectorHeight must be a positive value")
-            }
-            field = value
-            requestLayout()
+            itemHeight = value
         }
 
     /**
@@ -160,8 +182,14 @@ class WheelPicker @JvmOverloads constructor(
 
         val orientation = a.getInt(R.styleable.WheelPicker_android_orientation, DEFAULT_ORIENTATION)
         val circular = a.getBoolean(R.styleable.WheelPicker_circular, DEFAULT_CIRCULAR)
-        selectorWidth = a.getDimensionPixelSize(R.styleable.WheelPicker_selectorWidth, 0)
-        selectorHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
+        val itemWidth = a.getDimensionPixelSize(
+            R.styleable.WheelPicker_itemWidth,
+            a.getDimensionPixelSize(R.styleable.WheelPicker_selectorWidth, 0)
+        )
+        val itemHeight = a.getDimensionPixelSize(
+            R.styleable.WheelPicker_itemHeight,
+            a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
+        )
         a.recycle()
 
         recyclerView = RecyclerView(context)
@@ -262,18 +290,18 @@ class WheelPicker @JvmOverloads constructor(
 
         when (orientation) {
             HORIZONTAL -> {
-                val innerPadding = (layoutRect.width() / 2) - (selectorWidth / 2)
+                val innerPadding = (layoutRect.width() / 2) - (itemWidth / 2)
                 recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
-                if (selectorWidth == 0) {
-                    Log.w(TAG, "selectorWidth should be set bigger than 0")
+                if (itemWidth == 0) {
+                    Log.w(TAG, "itemWidth should be set bigger than 0")
                 }
             }
 
             VERTICAL -> {
-                val innerPadding = (layoutRect.height() / 2) - (selectorHeight / 2)
+                val innerPadding = (layoutRect.height() / 2) - (itemHeight / 2)
                 recyclerView.setPadding(0, innerPadding, 0, innerPadding)
-                if (selectorHeight == 0) {
-                    Log.w(TAG, "selectorHeight should be set bigger than 0")
+                if (itemHeight == 0) {
+                    Log.w(TAG, "itemHeight should be set bigger than 0")
                 }
             }
         }
@@ -318,27 +346,6 @@ class WheelPicker @JvmOverloads constructor(
         } else {
             recyclerView.scrollToPosition(position)
         }
-    }
-
-    /**
-     * Sets pixel width and height of the selector area in the picker. The size must be a positive.
-     *
-     * @param size A pixel size of the selector width and height.
-     */
-    fun setSelectorSize(size: Int) {
-        selectorWidth = size
-        selectorHeight = size
-    }
-
-    /**
-     * Sets pixel width and height of the selector area in the picker. The size must be a positive.
-     *
-     * @param width A pixel size of the selector width.
-     * @param height A pixel size of the selector height.
-     */
-    fun setSelectorSize(width: Int, height: Int) {
-        selectorWidth = width
-        selectorHeight = height
     }
 
     /**
