@@ -194,13 +194,14 @@ class WheelPicker @JvmOverloads constructor(
 
         recyclerView = RecyclerView(context)
         recyclerView.id = View.generateViewId()
-        layoutManager = PickerLayoutManager(orientation, circular)
+        layoutManager = PickerLayoutManager(orientation, circular, itemWidth, itemHeight)
         recyclerView.layoutManager = layoutManager
         recyclerView.layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT
         )
         recyclerView.clipToPadding = false
+        recyclerView.addOnChildAttachStateChangeListener(ChildLayoutParamsEnforcer())
         val snapHelper = CarouselSnapHelper()
         snapHelper.attachToRecyclerView(recyclerView)
         scrollListenerAdapter = ScrollListenerAdapter()
