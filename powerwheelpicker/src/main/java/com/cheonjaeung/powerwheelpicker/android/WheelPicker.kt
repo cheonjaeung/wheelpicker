@@ -24,15 +24,16 @@ import kotlin.math.roundToInt
 /**
  * [WheelPicker] is a view that allow user to select one item from multiple choices.
  *
- * [WheelPicker] needs some components to work correctly.
+ * [WheelPicker] is backed by [RecyclerView]. Set an [RecyclerView.Adapter] to handle dataset. Note that
+ * the [RecyclerView.ViewHolder]s must have `match_parent` for their `layout_width` and `layout_height`.
+ * The item width and height can be set to [itemWidth] and [itemHeight].
  *
- * - Adapter: An adapter implements [RecyclerView.Adapter] to handle items.
- * This view is implemented on top of the [RecyclerView]. Set adapter into [adapter] property or `setAdapter`
- * method in Java.
- * - Selector Size: A pixel size of the selector at center of the picker. The selector must be greater than 0.
- * The selector is also used for selection detecting. When an item is positioned within the selector,
- * selected callback will be triggered. Set selector size into [selectorWidth] and [selectorHeight] or
- * set `selector_width` and `selector_height` property in the XML.
+ * [WheelPicker] has a selector area used to calculate the selected item position. When an item is positioned
+ * within the center of the selector area, the [OnItemSelectedListener.onItemSelected] is called.
+ * The size of selector area is same to item size and it is determined by [itemWidth] and [itemHeight].
+ *
+ * [WheelPicker] supports customized item visual effect using animation properties via [ItemEffector].
+ * [ItemEffector] provides multiple callbacks to supports various effect implementations.
  */
 class WheelPicker @JvmOverloads constructor(
     context: Context,
@@ -665,7 +666,7 @@ class WheelPicker @JvmOverloads constructor(
      */
     fun interface OnItemSelectedListener {
         /**
-         * Callback that invoked when an item is positioned within the selector area.
+         * Callback that invoked when an item is positioned at the center of selector area.
          *
          * @param wheelPicker The [WheelPicker] view which scrolled.
          * @param position The selected item index.
