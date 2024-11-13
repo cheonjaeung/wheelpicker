@@ -1,0 +1,42 @@
+# Site Information
+site_name: 'PowerWheelPicker for Android'
+site_description: 'A highly customizable wheel picker view for Android.'
+site_author: 'Cheon Jaeung'
+site_url: 'https://cheonjaeung.github.io/powerwheelpicker-android/'
+copyright: 'Copyright &copy; 2023 Cheon Jaeung'
+
+# Theme Configurations
+theme:
+  name: 'material'
+  palette:
+    primary: 'white'
+    accent: 'pink'
+  icon:
+    logo: fontawesome/solid/bars-staggered
+  font:
+    text: Inter
+    code: Jetbrains Mono
+
+# Extensions
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+# Navigation Configurations
+nav:
+  - 'Overview': index.md
+  - 'Getting Started': getting-started.md
+  - 'Item Effect': effector.md
+  - 'Changelog': 'https://github.com/cheonjaeung/powerwheelpicker-android/blob/main/CHANGELOG.md'
+
+# Repository Information
+repo_name: 'powerwheelpicker-android'
+repo_url: 'https://github.com/cheonjaeung/powerwheelpicker-android'
