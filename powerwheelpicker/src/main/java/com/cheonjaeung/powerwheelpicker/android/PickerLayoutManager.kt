@@ -11,14 +11,18 @@ internal class PickerLayoutManager(
 ) : CarouselLayoutManager(orientation, circular) {
     var itemWidth: Int = itemWidth
         set(value) {
-            field = value
-            requestLayout()
+            if (value != field) {
+                field = value
+                requestLayout()
+            }
         }
 
     var itemHeight: Int = itemHeight
         set(value) {
-            field = value
-            requestLayout()
+            if (value != field) {
+                field = value
+                requestLayout()
+            }
         }
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
