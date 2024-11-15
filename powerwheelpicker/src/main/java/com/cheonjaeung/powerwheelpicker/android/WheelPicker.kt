@@ -264,23 +264,17 @@ class WheelPicker @JvmOverloads constructor(
         val circular = a.getBoolean(R.styleable.WheelPicker_circular, DEFAULT_CIRCULAR)
         val itemWidth = a.getDimensionPixelSize(R.styleable.WheelPicker_itemWidth, 0)
         val itemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_itemHeight, 0)
-        selectorWidth = a.getDimensionPixelSize(
-            R.styleable.WheelPicker_selector_width,
-            a.getDimensionPixelSize(R.styleable.WheelPicker_selectorWidth, 0)
-        )
-        selectorHeight = a.getDimensionPixelSize(
-            R.styleable.WheelPicker_selector_height,
-            a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
-        )
-        setSelectorBackgroundDrawable(a.getDrawable(R.styleable.WheelPicker_selector_background))
-        setSelectorForegroundDrawable(a.getDrawable(R.styleable.WheelPicker_selector_foreground))
-        selectorBackgroundTintList = a.getColorStateList(R.styleable.WheelPicker_selector_backgroundTint)
-        selectorForegroundTintList = a.getColorStateList(R.styleable.WheelPicker_selector_foregroundTint)
+        selectorWidth =  a.getDimensionPixelSize(R.styleable.WheelPicker_selectorWidth, 0)
+        selectorHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
+        setSelectorBackgroundDrawable(a.getDrawable(R.styleable.WheelPicker_selectorBackground))
+        setSelectorForegroundDrawable(a.getDrawable(R.styleable.WheelPicker_selectorForeground))
+        selectorBackgroundTintList = a.getColorStateList(R.styleable.WheelPicker_selectorBackgroundTint)
+        selectorForegroundTintList = a.getColorStateList(R.styleable.WheelPicker_selectorForegroundTint)
         selectorBackgroundTintMode = parseIntToTintMode(
-            a.getInt(R.styleable.WheelPicker_selector_backgroundTintMode, -1)
+            a.getInt(R.styleable.WheelPicker_selectorBackgroundTintMode, -1)
         )
         selectorForegroundTintMode = parseIntToTintMode(
-            a.getInt(R.styleable.WheelPicker_selector_foregroundTintMode, -1)
+            a.getInt(R.styleable.WheelPicker_selectorForegroundTintMode, -1)
         )
         a.recycle()
 

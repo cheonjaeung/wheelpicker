@@ -5,55 +5,51 @@
         <attr name="circular" format="boolean" />
         <attr name="itemWidth" format="dimension" />
         <attr name="itemHeight" format="dimension" />
-        <attr name="selector_background" format="color|reference" />
-        <attr name="selector_foreground" format="color|reference" />
-        <attr name="selector_backgroundTint" format="color" />
-        <attr name="selector_foregroundTint" format="color" />
-        <attr name="selector_backgroundTintMode" format="enum">
-            <enum name="clear" value="0" />
-            <enum name="src" value="1" />
-            <enum name="dst" value="2" />
-            <enum name="src_over" value="3" />
-            <enum name="dst_over" value="4" />
-            <enum name="src_in" value="5" />
-            <enum name="dst_in" value="6" />
-            <enum name="src_out" value="7" />
-            <enum name="dst_out" value="8" />
-            <enum name="src_atop" value="9" />
-            <enum name="dst_atop" value="10" />
-            <enum name="xor" value="11" />
-            <enum name="add" value="12" />
-            <enum name="multiply" value="13" />
-            <enum name="screen" value="14" />
-            <enum name="overlay" value="15" />
-            <enum name="darken" value="16" />
-            <enum name="lighten" value="17" />
-        </attr>
-        <attr name="selector_foregroundTintMode" format="enum">
-            <enum name="clear" value="0" />
-            <enum name="src" value="1" />
-            <enum name="dst" value="2" />
-            <enum name="src_over" value="3" />
-            <enum name="dst_over" value="4" />
-            <enum name="src_in" value="5" />
-            <enum name="dst_in" value="6" />
-            <enum name="src_out" value="7" />
-            <enum name="dst_out" value="8" />
-            <enum name="src_atop" value="9" />
-            <enum name="dst_atop" value="10" />
-            <enum name="xor" value="11" />
-            <enum name="add" value="12" />
-            <enum name="multiply" value="13" />
-            <enum name="screen" value="14" />
-            <enum name="overlay" value="15" />
-            <enum name="darken" value="16" />
-            <enum name="lighten" value="17" />
-        </attr>
-        <attr name="selector_width" format="dimension" />
-        <attr name="selector_height" format="dimension" />
-        <!-- Deprecated. Use selector_width instead. -->
         <attr name="selectorWidth" format="dimension" />
-        <!-- Deprecated. Use selector_height instead. -->
         <attr name="selectorHeight" format="dimension" />
+        <attr name="selectorBackground" format="color|reference" />
+        <attr name="selectorForeground" format="color|reference" />
+        <attr name="selectorBackgroundTint" format="color" />
+        <attr name="selectorForegroundTint" format="color" />
+        <attr name="selectorBackgroundTintMode" format="enum">
+            <enum name="clear" value="0" />
+            <enum name="src" value="1" />
+            <enum name="dst" value="2" />
+            <enum name="src_over" value="3" />
+            <enum name="dst_over" value="4" />
+            <enum name="src_in" value="5" />
+            <enum name="dst_in" value="6" />
+            <enum name="src_out" value="7" />
+            <enum name="dst_out" value="8" />
+            <enum name="src_atop" value="9" />
+            <enum name="dst_atop" value="10" />
+            <enum name="xor" value="11" />
+            <enum name="add" value="12" />
+            <enum name="multiply" value="13" />
+            <enum name="screen" value="14" />
+            <enum name="overlay" value="15" />
+            <enum name="darken" value="16" />
+            <enum name="lighten" value="17" />
+        </attr>
+        <attr name="selectorForegroundTintMode" format="enum">
+            <enum name="clear" value="0" />
+            <enum name="src" value="1" />
+            <enum name="dst" value="2" />
+            <enum name="src_over" value="3" />
+            <enum name="dst_over" value="4" />
+            <enum name="src_in" value="5" />
+            <enum name="dst_in" value="6" />
+            <enum name="src_out" value="7" />
+            <enum name="dst_out" value="8" />
+            <enum name="src_atop" value="9" />
+            <enum name="dst_atop" value="10" />
+            <enum name="xor" value="11" />
+            <enum name="add" value="12" />
+            <enum name="multiply" value="13" />
+            <enum name="screen" value="14" />
+            <enum name="overlay" value="15" />
+            <enum name="darken" value="16" />
+            <enum name="lighten" value="17" />
+        </attr>
     </declare-styleable>
 </resources>
