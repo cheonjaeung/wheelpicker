@@ -1,7 +1,9 @@
 package com.cheonjaeung.powerwheelpicker.android
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -137,12 +139,58 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * The [Drawable] for the background content of the selector area.
      */
-    private var selectorBackground: Drawable? = null
+    var selectorBackground: Drawable? = null
+        private set
+
+    /**
+     * The tint to apply to the [selectorBackground] drawable.
+     */
+    var selectorBackgroundTintList: ColorStateList? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                invalidate()
+            }
+        }
+
+    /**
+     * The blending mode to apply to the [selectorBackgroundTintList]. The default is [PorterDuff.Mode.SRC_IN].
+     */
+    var selectorBackgroundTintMode: PorterDuff.Mode? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                invalidate()
+            }
+        }
 
     /**
      * The [Drawable] for the foreground content of the selector area.
      */
-    private var selectorForeground: Drawable? = null
+    var selectorForeground: Drawable? = null
+        private set
+
+    /**
+     * The tint to apply to the [selectorForeground] drawable.
+     */
+    var selectorForegroundTintList: ColorStateList? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                invalidate()
+            }
+        }
+
+    /**
+     * The blending mode to apply to the [selectorForegroundTintList]. The default is [PorterDuff.Mode.SRC_IN].
+     */
+    var selectorForegroundTintMode: PorterDuff.Mode? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                invalidate()
+            }
+        }
 
     /**
      * A pixel width of the selector area in the picker. The size must be a positive.
@@ -224,10 +272,16 @@ class WheelPicker @JvmOverloads constructor(
             R.styleable.WheelPicker_selector_height,
             a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
         )
-        val selectorBackgroundDrawable = a.getDrawable(R.styleable.WheelPicker_selector_background)
-        setSelectorBackgroundDrawable(selectorBackgroundDrawable)
-        val selectorForegroundDrawable = a.getDrawable(R.styleable.WheelPicker_selector_foreground)
-        setSelectorForegroundDrawable(selectorForegroundDrawable)
+        setSelectorBackgroundDrawable(a.getDrawable(R.styleable.WheelPicker_selector_background))
+        setSelectorForegroundDrawable(a.getDrawable(R.styleable.WheelPicker_selector_foreground))
+        selectorBackgroundTintList = a.getColorStateList(R.styleable.WheelPicker_selector_backgroundTint)
+        selectorForegroundTintList = a.getColorStateList(R.styleable.WheelPicker_selector_foregroundTint)
+        selectorBackgroundTintMode = parseIntToTintMode(
+            a.getInt(R.styleable.WheelPicker_selector_backgroundTintMode, -1)
+        )
+        selectorForegroundTintMode = parseIntToTintMode(
+            a.getInt(R.styleable.WheelPicker_selector_foregroundTintMode, -1)
+        )
         a.recycle()
 
         setWillNotDraw(false)
@@ -252,6 +306,30 @@ class WheelPicker @JvmOverloads constructor(
 
         attachViewToParent(recyclerView, 0, recyclerView.layoutParams)
         recyclerView.scrollToPosition(0)
+    }
+
+    private fun parseIntToTintMode(value: Int): PorterDuff.Mode? {
+        return when (value) {
+            0 -> PorterDuff.Mode.CLEAR
+            1 -> PorterDuff.Mode.SRC
+            2 -> PorterDuff.Mode.DST
+            3 -> PorterDuff.Mode.SRC_OVER
+            4 -> PorterDuff.Mode.DST_OVER
+            5 -> PorterDuff.Mode.SRC_IN
+            6 -> PorterDuff.Mode.DST_IN
+            7 -> PorterDuff.Mode.SRC_OUT
+            8 -> PorterDuff.Mode.DST_OUT
+            9 -> PorterDuff.Mode.SRC_ATOP
+            10 -> PorterDuff.Mode.DST_ATOP
+            11 -> PorterDuff.Mode.XOR
+            12 -> PorterDuff.Mode.ADD
+            13 -> PorterDuff.Mode.MULTIPLY
+            14 -> PorterDuff.Mode.SCREEN
+            15 -> PorterDuff.Mode.OVERLAY
+            16 -> PorterDuff.Mode.DARKEN
+            17 -> PorterDuff.Mode.LIGHTEN
+            else -> null
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -378,6 +456,10 @@ class WheelPicker @JvmOverloads constructor(
 
         selectorBackground?.let { background ->
             background.bounds = selectorBounds
+            selectorBackgroundTintList?.let { tint ->
+                background.setTintList(tint)
+                selectorBackgroundTintMode?.let { background.setTintMode(it) }
+            }
             background.draw(canvas)
         }
 
@@ -385,6 +467,10 @@ class WheelPicker @JvmOverloads constructor(
 
         selectorForeground?.let { foreground ->
             foreground.bounds = selectorBounds
+            selectorForegroundTintList?.let { tint ->
+                foreground.setTintList(tint)
+                selectorForegroundTintMode?.let { foreground.setTintMode(it) }
+            }
             foreground.draw(canvas)
         }
     }
