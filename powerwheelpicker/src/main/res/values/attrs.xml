@@ -5,6 +5,8 @@
         <attr name="circular" format="boolean" />
         <attr name="itemWidth" format="dimension" />
         <attr name="itemHeight" format="dimension" />
+        <attr name="selector_background" format="color|reference" />
+        <attr name="selector_foreground" format="color|reference" />
         <!-- Deprecated. Use itemWidth instead. -->
         <attr name="selectorWidth" format="dimension" />
         <!-- Deprecated. Use itemWidth instead. -->

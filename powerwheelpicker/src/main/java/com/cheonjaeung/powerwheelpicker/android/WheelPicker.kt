@@ -1,7 +1,10 @@
 package com.cheonjaeung.powerwheelpicker.android
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
@@ -11,9 +14,14 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cheonjaeung.simplecarousel.android.CarouselSnapHelper
@@ -56,6 +64,11 @@ class WheelPicker @JvmOverloads constructor(
      * Reusable instance to layout internal views.
      */
     private val layoutRect: Rect = Rect()
+
+    /**
+     * Reusable instance for the selector bounds.
+     */
+    private val selectorRect: Rect = Rect()
 
     /**
      * A [RecyclerView.Adapter] to provide picker items on demand.
@@ -120,6 +133,16 @@ class WheelPicker @JvmOverloads constructor(
             }
             layoutManager.itemHeight = value
         }
+
+    /**
+     * The [Drawable] for the background content of the selector area.
+     */
+    private var selectorBackground: Drawable? = null
+
+    /**
+     * The [Drawable] for the foreground content of the selector area.
+     */
+    private var selectorForeground: Drawable? = null
 
     /**
      * A pixel width of the selector area in the picker. The size must be a positive.
@@ -191,6 +214,10 @@ class WheelPicker @JvmOverloads constructor(
             R.styleable.WheelPicker_itemHeight,
             a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
         )
+        val selectorBackgroundDrawable = a.getDrawable(R.styleable.WheelPicker_selector_background)
+        setSelectorBackgroundDrawable(selectorBackgroundDrawable)
+        val selectorForegroundDrawable = a.getDrawable(R.styleable.WheelPicker_selector_foreground)
+        setSelectorForegroundDrawable(selectorForegroundDrawable)
         a.recycle()
 
         recyclerView = RecyclerView(context)
@@ -297,6 +324,13 @@ class WheelPicker @JvmOverloads constructor(
                 if (itemWidth == 0) {
                     Log.w(TAG, "itemWidth should be set bigger than 0")
                 }
+
+                selectorRect.set(
+                    innerPadding,
+                    layoutRect.top,
+                    layoutRect.right - innerPadding,
+                    layoutRect.bottom
+                )
             }
 
             VERTICAL -> {
@@ -305,10 +339,31 @@ class WheelPicker @JvmOverloads constructor(
                 if (itemHeight == 0) {
                     Log.w(TAG, "itemHeight should be set bigger than 0")
                 }
+
+                selectorRect.set(
+                    layoutRect.left,
+                    innerPadding,
+                    layoutRect.right,
+                    layoutRect.bottom - innerPadding
+                )
             }
         }
 
         recyclerView.layout(layoutRect.left, layoutRect.top, layoutRect.right, layoutRect.bottom)
+    }
+
+    override fun dispatchDraw(canvas: Canvas) {
+        selectorBackground?.let { background ->
+            background.bounds = selectorRect
+            background.draw(canvas)
+        }
+
+        super.dispatchDraw(canvas)
+
+        selectorForeground?.let { foreground ->
+            foreground.bounds = selectorRect
+            foreground.draw(canvas)
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -348,6 +403,80 @@ class WheelPicker @JvmOverloads constructor(
         } else {
             recyclerView.scrollToPosition(position)
         }
+    }
+
+    /**
+     * Sets a [Drawable] for the background content of the selector area.
+     */
+    fun setSelectorBackgroundDrawable(drawable: Drawable?) {
+        selectorBackground = drawable
+        invalidate()
+    }
+
+    /**
+     * Sets a [Drawable] from specific resource for the background content of the selector area.
+     */
+    fun setSelectorBackgroundDrawableResource(@DrawableRes resId: Int) {
+        if (resId == 0) {
+            return
+        }
+        val drawable = AppCompatResources.getDrawable(context, resId)
+        setSelectorBackgroundDrawable(drawable)
+    }
+
+    /**
+     * Sets a color for the background of the selector area.
+     */
+    fun setSelectorBackgroundColor(@ColorInt color: Int) {
+        setSelectorBackgroundDrawable(ColorDrawable(color))
+    }
+
+    /**
+     * Sets a color from specific resource for the background of the selector area.
+     */
+    fun setSelectorBackgroundColorResource(@ColorRes resId: Int) {
+        if (resId == 0) {
+            return
+        }
+        val color = ContextCompat.getColor(context, resId)
+        setSelectorBackgroundColor(color)
+    }
+
+    /**
+     * Sets a [Drawable] for the foreground content of the selector area.
+     */
+    fun setSelectorForegroundDrawable(drawable: Drawable?) {
+        selectorForeground = drawable
+        invalidate()
+    }
+
+    /**
+     * Sets a [Drawable] from specific resource for the foreground content of the selector area.
+     */
+    fun setSelectorForegroundDrawableResource(@DrawableRes resId: Int) {
+        if (resId == 0) {
+            return
+        }
+        val drawable = AppCompatResources.getDrawable(context, resId)
+        setSelectorForegroundDrawable(drawable)
+    }
+
+    /**
+     * Sets a color for the foreground of the selector area.
+     */
+    fun setSelectorForegroundColor(@ColorInt color: Int) {
+        setSelectorForegroundDrawable(ColorDrawable(color))
+    }
+
+    /**
+     * Sets a color from specific resource for the foreground of the selector area.
+     */
+    fun setSelectorForegroundColorResource(@ColorRes resId: Int) {
+        if (resId == 0) {
+            return
+        }
+        val color = ContextCompat.getColor(context, resId)
+        setSelectorForegroundColor(color)
     }
 
     /**
