@@ -220,6 +220,7 @@ class WheelPicker @JvmOverloads constructor(
         setSelectorForegroundDrawable(selectorForegroundDrawable)
         a.recycle()
 
+        setWillNotDraw(false)
         recyclerView = RecyclerView(context)
         recyclerView.id = View.generateViewId()
         layoutManager = PickerLayoutManager(orientation, circular, itemWidth, itemHeight)
@@ -324,13 +325,6 @@ class WheelPicker @JvmOverloads constructor(
                 if (itemWidth == 0) {
                     Log.w(TAG, "itemWidth should be set bigger than 0")
                 }
-
-                selectorBounds.set(
-                    innerPadding,
-                    layoutBounds.top,
-                    layoutBounds.right - innerPadding,
-                    layoutBounds.bottom
-                )
             }
 
             VERTICAL -> {
@@ -339,26 +333,45 @@ class WheelPicker @JvmOverloads constructor(
                 if (itemHeight == 0) {
                     Log.w(TAG, "itemHeight should be set bigger than 0")
                 }
-
-                selectorBounds.set(
-                    layoutBounds.left,
-                    innerPadding,
-                    layoutBounds.right,
-                    layoutBounds.bottom - innerPadding
-                )
             }
         }
 
         recyclerView.layout(layoutBounds.left, layoutBounds.top, layoutBounds.right, layoutBounds.bottom)
     }
 
-    override fun dispatchDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas) {
+        when (orientation) {
+            HORIZONTAL -> {
+                if (selectorWidth == 0) {
+                    Log.d(TAG, "Skipping selector drawing: selectorWidth=0")
+                }
+                selectorBounds.set(
+                    (width / 2) - (selectorWidth / 2),
+                    layoutBounds.top,
+                    (width / 2) + (selectorWidth / 2),
+                    layoutBounds.bottom
+                )
+            }
+
+            VERTICAL -> {
+                if (selectorHeight == 0) {
+                    Log.d(TAG, "Skipping selector drawing: selectorHeight=0")
+                }
+                selectorBounds.set(
+                    layoutBounds.left,
+                    (height / 2) - (selectorHeight / 2),
+                    layoutBounds.right,
+                    (height / 2) + (selectorHeight / 2)
+                )
+            }
+        }
+
         selectorBackground?.let { background ->
             background.bounds = selectorBounds
             background.draw(canvas)
         }
 
-        super.dispatchDraw(canvas)
+        super.onDraw(canvas)
 
         selectorForeground?.let { foreground ->
             foreground.bounds = selectorBounds
