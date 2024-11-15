@@ -63,12 +63,12 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * Reusable instance to layout internal views.
      */
-    private val layoutRect: Rect = Rect()
+    private val layoutBounds: Rect = Rect()
 
     /**
      * Reusable instance for the selector bounds.
      */
-    private val selectorRect: Rect = Rect()
+    private val selectorBounds: Rect = Rect()
 
     /**
      * A [RecyclerView.Adapter] to provide picker items on demand.
@@ -310,7 +310,7 @@ class WheelPicker @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        layoutRect.set(
+        layoutBounds.set(
             paddingLeft,
             paddingTop,
             right - left - paddingRight,
@@ -319,49 +319,49 @@ class WheelPicker @JvmOverloads constructor(
 
         when (orientation) {
             HORIZONTAL -> {
-                val innerPadding = (layoutRect.width() / 2) - (itemWidth / 2)
+                val innerPadding = (layoutBounds.width() / 2) - (itemWidth / 2)
                 recyclerView.setPadding(innerPadding, 0, innerPadding, 0)
                 if (itemWidth == 0) {
                     Log.w(TAG, "itemWidth should be set bigger than 0")
                 }
 
-                selectorRect.set(
+                selectorBounds.set(
                     innerPadding,
-                    layoutRect.top,
-                    layoutRect.right - innerPadding,
-                    layoutRect.bottom
+                    layoutBounds.top,
+                    layoutBounds.right - innerPadding,
+                    layoutBounds.bottom
                 )
             }
 
             VERTICAL -> {
-                val innerPadding = (layoutRect.height() / 2) - (itemHeight / 2)
+                val innerPadding = (layoutBounds.height() / 2) - (itemHeight / 2)
                 recyclerView.setPadding(0, innerPadding, 0, innerPadding)
                 if (itemHeight == 0) {
                     Log.w(TAG, "itemHeight should be set bigger than 0")
                 }
 
-                selectorRect.set(
-                    layoutRect.left,
+                selectorBounds.set(
+                    layoutBounds.left,
                     innerPadding,
-                    layoutRect.right,
-                    layoutRect.bottom - innerPadding
+                    layoutBounds.right,
+                    layoutBounds.bottom - innerPadding
                 )
             }
         }
 
-        recyclerView.layout(layoutRect.left, layoutRect.top, layoutRect.right, layoutRect.bottom)
+        recyclerView.layout(layoutBounds.left, layoutBounds.top, layoutBounds.right, layoutBounds.bottom)
     }
 
     override fun dispatchDraw(canvas: Canvas) {
         selectorBackground?.let { background ->
-            background.bounds = selectorRect
+            background.bounds = selectorBounds
             background.draw(canvas)
         }
 
         super.dispatchDraw(canvas)
 
         selectorForeground?.let { foreground ->
-            foreground.bounds = selectorRect
+            foreground.bounds = selectorBounds
             foreground.draw(canvas)
         }
     }
