@@ -7,9 +7,11 @@
         <attr name="itemHeight" format="dimension" />
         <attr name="selector_background" format="color|reference" />
         <attr name="selector_foreground" format="color|reference" />
-        <!-- Deprecated. Use itemWidth instead. -->
+        <attr name="selector_width" format="dimension" />
+        <attr name="selector_height" format="dimension" />
+        <!-- Deprecated. Use selector_width instead. -->
         <attr name="selectorWidth" format="dimension" />
-        <!-- Deprecated. Use itemWidth instead. -->
+        <!-- Deprecated. Use selector_height instead. -->
         <attr name="selectorHeight" format="dimension" />
     </declare-styleable>
 </resources>

@@ -147,21 +147,29 @@ class WheelPicker @JvmOverloads constructor(
     /**
      * A pixel width of the selector area in the picker. The size must be a positive.
      */
-    @Deprecated("Use itemWidth instead", ReplaceWith("itemWidth"))
-    var selectorWidth: Int
-        get() = itemWidth
+    var selectorWidth: Int = 0
         set(value) {
-            itemWidth = value
+            if (value < 0) {
+                throw IllegalArgumentException("selecorWidth must not be a negative: selectorWidth=$value")
+            }
+            if (value != field) {
+                field = value
+                invalidate()
+            }
         }
 
     /**
      * A pixel height of the selector area in the picker. The size must be a positive.
      */
-    @Deprecated("Use itemHeight instead", ReplaceWith("itemHeight"))
-    var selectorHeight: Int
-        get() = itemHeight
+    var selectorHeight: Int = 0
         set(value) {
-            itemHeight = value
+            if (value < 0) {
+                throw IllegalArgumentException("selectorHeight must not be a negative: selectorHeight=$value")
+            }
+            if (value != field) {
+                field = value
+                invalidate()
+            }
         }
 
     /**
@@ -206,12 +214,14 @@ class WheelPicker @JvmOverloads constructor(
 
         val orientation = a.getInt(R.styleable.WheelPicker_android_orientation, DEFAULT_ORIENTATION)
         val circular = a.getBoolean(R.styleable.WheelPicker_circular, DEFAULT_CIRCULAR)
-        val itemWidth = a.getDimensionPixelSize(
-            R.styleable.WheelPicker_itemWidth,
+        val itemWidth = a.getDimensionPixelSize(R.styleable.WheelPicker_itemWidth, 0)
+        val itemHeight = a.getDimensionPixelSize(R.styleable.WheelPicker_itemHeight, 0)
+        selectorWidth = a.getDimensionPixelSize(
+            R.styleable.WheelPicker_selector_width,
             a.getDimensionPixelSize(R.styleable.WheelPicker_selectorWidth, 0)
         )
-        val itemHeight = a.getDimensionPixelSize(
-            R.styleable.WheelPicker_itemHeight,
+        selectorHeight = a.getDimensionPixelSize(
+            R.styleable.WheelPicker_selector_height,
             a.getDimensionPixelSize(R.styleable.WheelPicker_selectorHeight, 0)
         )
         val selectorBackgroundDrawable = a.getDrawable(R.styleable.WheelPicker_selector_background)
