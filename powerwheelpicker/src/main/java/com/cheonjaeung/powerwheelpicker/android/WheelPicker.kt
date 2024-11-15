@@ -38,7 +38,7 @@ import kotlin.math.roundToInt
  *
  * [WheelPicker] has a selector area used to calculate the selected item position. When an item is positioned
  * within the center of the selector area, the [OnItemSelectedListener.onItemSelected] is called.
- * The size of selector area is same to item size and it is determined by [itemWidth] and [itemHeight].
+ * The size of selector area is determined by [selectorWidth] and [selectorHeight].
  *
  * [WheelPicker] supports customized item visual effect using animation properties via [ItemEffector].
  * [ItemEffector] provides multiple callbacks to supports various effect implementations.
